@@ -21,4 +21,9 @@ public class MainController {
     public String greeting(Model model) {
         return "home";
     }
+
+    @GetMapping("/forex")
+    public String forex(Model model) {
+        return "forexfile";
+    }
 }
