@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login Page</title>
+  <link rel="stylesheet" href="/css/cssset.css" />
+  <!-- Font Awesome CDN link for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #6b73ff, #000dff);
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .wrapper {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .row i {
+      position: absolute;
+      left: 10px;
+      color: #666;
+    }
+    .row input {
+      width: 100%;
+      padding: 10px 15px 10px 40px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #f9f9f9;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: border-color 0.3s ease;
+    }
+    .row input:focus {
+      border-color: #6b73ff;
+      outline: none;
+    }
+    .button input {
+      background: #6b73ff;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      padding: 10px 0;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .button input:hover {
+      background: #4a52d4;
+    }
+    .signup-link {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+    }
+    .signup-link a {
+      color: #6b73ff;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+    .signup-link a:hover {
+      color: #4a52d4;
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="title"><span>Log in</span></div>
+  <form action="/" method="post">
+    <div class="row">
+      <i class="fas fa-user"></i>
+      <input type="text" name="login" placeholder="Enter login" required />
+    </div>
+    <div class="row">
+      <i class="fas fa-lock"></i>
+      <input type="password" name="access_key" placeholder="Enter password" required />
+    </div>
+    <div class="row button">
+      <input type="submit" value="Enter" />
+    </div>
+  </form>
+</div>
+</body>
+</html>
