@@ -1,6 +1,6 @@
 package hospital_registration.demo.controllers;
 
-import hospital_registration.demo.Models.DoctorModel;
+import hospital_registration.demo.Models.MainDoctorModel;
 import hospital_registration.demo.repo.MainDoctorRepo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class MainController {
      * @param model the model to add attributes to
      * @return the name of the home view
      */
-    @GetMapping("/home")
+    @GetMapping("/MainDoctorHome")
     public String home(Model model, HttpSession session) {
         if (session.getAttribute("loggedInUser") == null) {
             return "redirect:/"; // Якщо користувач не увійшов, повернути на сторінку логіна
@@ -50,12 +50,12 @@ public class MainController {
     }
 
     @PostMapping("/")
-    public String login(@ModelAttribute DoctorModel maindoctor, Model model, HttpSession session) {
-        Optional<DoctorModel> loggedInUser = doctorRepo.findByLogin(maindoctor.getLogin());
+    public String login(@ModelAttribute MainDoctorModel maindoctor, Model model, HttpSession session) {
+        Optional<MainDoctorModel> loggedInUser = doctorRepo.findByLogin(maindoctor.getLogin());
 
         if (loggedInUser.isPresent() && loggedInUser.get().getAccess_key().equals(maindoctor.getAccess_key())) {
             session.setAttribute("loggedInUser", loggedInUser.get());
-            return "redirect:/home"; // Успішний вхід
+            return "redirect:/MainDoctorHome"; // Успішний вхід
         } else {
             return "redirect:/?error=true"; // Помилка аутентифікації
         }

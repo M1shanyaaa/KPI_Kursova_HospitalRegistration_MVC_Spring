@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class DoctorModel {
+public class MainDoctorModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -20,7 +20,7 @@ public class DoctorModel {
     private String position;
     private String access_key;
 
-    public DoctorModel(String login, String access_key){
+    public MainDoctorModel(String login, String access_key){
         this.login = login;
         this.access_key = access_key;
     }
@@ -80,7 +80,7 @@ public class DoctorModel {
     public void setAccess_key(String access_key) {
         this.access_key = access_key;
     }
-    public DoctorModel() {
+    public MainDoctorModel() {
     }
 
 }
