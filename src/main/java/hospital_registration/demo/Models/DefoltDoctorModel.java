@@ -1,10 +1,7 @@
 package hospital_registration.demo.Models;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
 public class DefoltDoctorModel {
@@ -13,13 +10,36 @@ public class DefoltDoctorModel {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Ім'я не може бути порожнім")
     private String full_name;
+
+    @NotBlank(message = "Логін не може бути порожнім")
     private String login;
-    private int phone;
+
+    @NotNull(message = "Номер телефону не може бути порожнім")
+    @Min(value = 100000000, message = "Некоректний номер телефону")
+    private Integer phone = 0; // Значення за замовчуванням, щоб уникнути null
+
+    @NotBlank(message = "Позиція не може бути порожньою")
     private String position;
-    private String login;
+
+    @NotBlank(message = "Пароль не може бути порожнім")
     private String access_key;
 
+    // Конструктор без параметрів
+    public DefoltDoctorModel() {
+    }
+
+    // Конструктор із параметрами
+    public DefoltDoctorModel(String full_name, String login, Integer phone, String position, String access_key) {
+        this.full_name = full_name;
+        this.login = login;
+        this.phone = (phone != null) ? phone : 0; // Захист від null
+        this.position = position;
+        this.access_key = access_key;
+    }
+
+    // Гетери та сетери
     public Long getId() {
         return id;
     }
@@ -44,20 +64,12 @@ public class DefoltDoctorModel {
         this.login = login;
     }
 
-    public String getAccess_key() {
-        return access_key;
+    public Integer getPhone() {
+        return (phone != null) ? phone : 0; // Захист від null
     }
 
-    public void setAccess_key(String access_key) {
-        this.access_key = access_key;
-    }
-
-    public int getPhone() {
-        return phone;
-    }
-
-    public void setPhone(int phone) {
-        this.phone = phone;
+    public void setPhone(Integer phone) {
+        this.phone = (phone != null) ? phone : 0; // Захист від null
     }
 
     public String getPosition() {
@@ -68,8 +80,11 @@ public class DefoltDoctorModel {
         this.position = position;
     }
 
-
-    public DefoltDoctorModel() {
+    public String getAccess_key() {
+        return access_key;
     }
 
+    public void setAccess_key(String access_key) {
+        this.access_key = access_key;
+    }
 }

@@ -1,7 +1,9 @@
 package hospital_registration.demo.repo;
 
 import hospital_registration.demo.Models.DefoltDoctorModel;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface DefoltDoctorRepo extends CrudRepository<DefoltDoctorModel, Long>{
+@Repository
+public interface DefoltDoctorRepo extends JpaRepository<DefoltDoctorModel, Long> {
 }
