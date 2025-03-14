@@ -10,6 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Optional;
+
 @Controller
 public class AddPersonalController {
 
@@ -26,12 +28,21 @@ public class AddPersonalController {
     public String addPersonal(
             @Valid @ModelAttribute("person") PersonalModel person,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         if (bindingResult.hasErrors()) {
             return "/addPersonal";
         }
 
+        // Перевірка на унікальність логіна
+        Optional<PersonalModel> existingPerson = personalRepo.findByLogin(person.getLogin());
+        if (existingPerson.isPresent()) {
+            model.addAttribute("errorMessage", "Цей логін вже існує. Виберіть інший логін.");
+            return "/addPersonal"; // Повертаємо на ту саму сторінку з повідомленням
+        }
+
+        // Якщо логін унікальний, зберігаємо персонал
         personalRepo.save(person);
         redirectAttributes.addFlashAttribute("successMessage", "Медичний персонал успішно додано!");
         return "redirect:/addPersonal"; // Виправлено шлях

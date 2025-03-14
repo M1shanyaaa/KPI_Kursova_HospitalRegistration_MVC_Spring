@@ -14,6 +14,7 @@ public class PersonalModel {
     private String full_name;
 
     @NotBlank(message = "Логін не може бути порожнім")
+    @Column(unique = true)  // Додаємо унікальність для логіну
     private String login;
 
     @NotNull(message = "Номер телефону не може бути порожнім")

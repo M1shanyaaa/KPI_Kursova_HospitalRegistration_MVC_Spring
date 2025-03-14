@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PersonalRepo extends JpaRepository<PersonalModel, Long> {
-    Optional<PersonalModel> findByLogin(String login);
+    Optional<PersonalModel> findByLogin(String login);  // Залишаємо метод для пошуку за логіном
 }
