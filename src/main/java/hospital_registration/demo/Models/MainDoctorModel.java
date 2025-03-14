@@ -82,5 +82,4 @@ public class MainDoctorModel {
     }
     public MainDoctorModel() {
     }
-
 }

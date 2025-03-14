@@ -1,16 +1,10 @@
 package hospital_registration.demo.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
 @Entity
-public class NurseModel {
+public class PersonalModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,11 +27,11 @@ public class NurseModel {
     private String access_key;
 
     // Конструктор без параметрів
-    public NurseModel() {
+    public PersonalModel() {
     }
 
     // Конструктор із параметрами
-    public NurseModel(String full_name, String login, Integer phone, String position, String access_key) {
+    public PersonalModel(String full_name, String login, Integer phone, String position, String access_key) {
         this.full_name = full_name;
         this.login = login;
         this.phone = (phone != null) ? phone : 0; // Захист від null
@@ -93,5 +87,4 @@ public class NurseModel {
     public void setAccess_key(String access_key) {
         this.access_key = access_key;
     }
-
 }

@@ -1,19 +1,18 @@
 <div th:fragment="header">
     <div class="container">
         <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-            <div class="col-md-3 mb-2 mb-md-0">
+            <div class="col-md-3 mb-2 mb-md-0 d-flex align-items-center">
                 <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-                    <svg class="bi" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+                    <img src="/10469-hospital.png" alt="Hospital Logo" width="40" height="40" class="me-2">
                 </a>
+                <span class="fs-5 fw-bold">Hospital Registration</span>
             </div>
 
             <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="/MainDoctorHome" class="nav-link px-2 link-secondary">Home</a></li>
-                <li><a href="/addDoctor" class="nav-link px-2">Додавання лікаря</a></li>
-                <li><a href="/addNurse" class="nav-link px-2">Додавання медсестр</a></li>
+                <li><a href="/" class="nav-link px-2">Додавання лікаря</a></li>
                 <li><a href="/booking" class="nav-link px-2">...</a></li>
             </ul>
-
         </header>
     </div>
 </div>
