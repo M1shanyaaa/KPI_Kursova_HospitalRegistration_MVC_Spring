@@ -36,10 +36,6 @@ public class MainController {
         return "home";
     }
 
-    @GetMapping("/forex")
-    public String forex(Model model) {
-        return "forexfile";
-    }
 
     @GetMapping("/")
     public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
