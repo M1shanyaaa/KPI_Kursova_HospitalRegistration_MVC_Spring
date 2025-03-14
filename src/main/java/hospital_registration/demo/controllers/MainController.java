@@ -59,7 +59,7 @@ public class MainController {
      * @param maindoctor the model object containing login information
      * @param model      the model to add attributes to
      * @param session    the HTTP session to store authenticated user
-     * @return redirect to home page if successful, otherwise back to login with error
+     * @return redirect to respective home page if successful, otherwise back to login with error
      */
     @PostMapping("/")
     public String login(@ModelAttribute PersonalModel maindoctor, Model model, HttpSession session) {
@@ -67,11 +67,19 @@ public class MainController {
 
         if (loggedInUser.isPresent() && loggedInUser.get().getAccess_key().equals(maindoctor.getAccess_key())) {
             session.setAttribute("loggedInUser", loggedInUser.get());
-            return "redirect:/MainDoctorHome"; // Successful login
-        } else {
-            return "redirect:/?error=true"; // Authentication failed
+
+            // Redirect based on user position
+            String position = loggedInUser.get().getPosition();
+            if ("Головний лікар".equalsIgnoreCase(position)) {
+                return "redirect:/MainDoctorHome";
+            } else if ("Медсестра".equalsIgnoreCase(position)) {
+                return "redirect:/NurseHome";
+            }
         }
+
+        return "redirect:/?error=true"; // Authentication failed
     }
+
 
     /**
      * Logs out the current user and invalidates the session.
