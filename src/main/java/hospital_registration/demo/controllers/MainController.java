@@ -74,6 +74,8 @@ public class MainController {
                 return "redirect:/MainDoctorHome";
             } else if ("Медсестра".equalsIgnoreCase(position)) {
                 return "redirect:/NurseHome";
+            }else if ("Лікар".equalsIgnoreCase(position)) {
+                return "redirect:/DoctorHome";
             }
         }
 

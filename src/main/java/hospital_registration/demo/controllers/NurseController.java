@@ -12,8 +12,9 @@ public class NurseController {
     @GetMapping("/NurseHome")
     public String NurseHome(Model model, HttpSession session) {
         if (session.getAttribute("loggedInUser") == null) {
-            return "redirect:/NurseHome"; // Redirect to login if user is not authenticated
+            return "redirect:/"; // Redirect to login if user is not authenticated
         }
-        return "home";
+        return "NurseHome";
     }
+
 }

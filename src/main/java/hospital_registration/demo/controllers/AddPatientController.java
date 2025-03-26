@@ -1,0 +1,53 @@
+package hospital_registration.demo.controllers;
+
+import hospital_registration.demo.Models.PatientModel;
+import hospital_registration.demo.Models.PersonalModel;
+import hospital_registration.demo.repo.PatientRepo;
+import hospital_registration.demo.repo.PersonalRepo;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/patients")
+public class AddPatientController {
+
+    private final PatientRepo patientRepo;
+    private final PersonalRepo doctorRepo;
+
+    @Autowired
+    public AddPatientController(PatientRepo patientRepo, PersonalRepo doctorRepo) {
+        this.patientRepo = patientRepo;
+        this.doctorRepo = doctorRepo;
+    }
+
+    @GetMapping("/add")
+    public String showAddPatientForm(Model model) {
+        model.addAttribute("patient", new PatientModel());
+        model.addAttribute("doctors", doctorRepo.findAll());
+        return "patient-record";
+    }
+
+    @PostMapping("/add")
+    public String addPatient(
+            @Valid @ModelAttribute("patient") PatientModel patient,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes,
+            Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("doctors", doctorRepo.findAll());
+            return "patient-record";
+        }
+
+        patientRepo.save(patient);
+        redirectAttributes.addFlashAttribute("successMessage", "Пацієнта успішно додано!");
+        return "redirect:/patients/add";
+    }
+}

@@ -21,7 +21,7 @@ public class AddPersonalController {
     @GetMapping("/addPersonal")
     public String showAddPersonalForm(Model model) {
         model.addAttribute("person", new PersonalModel()); // Виправлено ім'я атрибута
-        return "/addPersonal";
+        return "addPersonal";
     }
 
     @PostMapping("/addPersonal")
@@ -32,14 +32,14 @@ public class AddPersonalController {
             Model model) {
 
         if (bindingResult.hasErrors()) {
-            return "/addPersonal";
+            return "addPersonal";
         }
 
         // Перевірка на унікальність логіна
         Optional<PersonalModel> existingPerson = personalRepo.findByLogin(person.getLogin());
         if (existingPerson.isPresent()) {
             model.addAttribute("errorMessage", "Цей логін вже існує. Виберіть інший логін.");
-            return "/addPersonal"; // Повертаємо на ту саму сторінку з повідомленням
+            return "addPersonal"; // Повертаємо на ту саму сторінку з повідомленням
         }
 
         // Якщо логін унікальний, зберігаємо персонал
