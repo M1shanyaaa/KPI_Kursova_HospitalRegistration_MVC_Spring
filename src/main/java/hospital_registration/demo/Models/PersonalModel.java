@@ -24,6 +24,9 @@ public class PersonalModel {
     @NotBlank(message = "Позиція не може бути порожньою")
     private String position;
 
+    @NotBlank(message = "Спеціалазація не може бути порожньою")
+    private String specialty;
+
     @NotBlank(message = "Пароль не може бути порожнім")
     private String access_key;
 
@@ -32,12 +35,13 @@ public class PersonalModel {
     }
 
     // Конструктор із параметрами
-    public PersonalModel(String full_name, String login, Integer phone, String position, String access_key) {
+    public PersonalModel(String full_name, String login, Integer phone, String position, String specialty, String access_key) {
         this.full_name = full_name;
         this.login = login;
         this.phone = (phone != null) ? phone : 0; // Захист від null
         this.position = position;
         this.access_key = access_key;
+        this.specialty = specialty;
     }
 
     // Гетери та сетери
@@ -88,4 +92,12 @@ public class PersonalModel {
     public void setAccess_key(String access_key) {
         this.access_key = access_key;
     }
+
+    public String getSpecialty() {
+        return specialty;
+    }
+    public void setSpecialty(String specialty) {
+        this.specialty = specialty;
+    }
+
 }

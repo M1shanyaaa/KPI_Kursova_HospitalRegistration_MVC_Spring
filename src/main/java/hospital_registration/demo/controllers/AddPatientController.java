@@ -46,7 +46,22 @@ public class AddPatientController {
             return "patient-record";
         }
 
+        // Отримання id лікаря, який передається у формі
+        Long doctorId = patient.getDoctor() != null ? patient.getDoctor().getId() : null;
+
+        if (doctorId == null || !doctorRepo.existsById(doctorId)) {
+            bindingResult.rejectValue("doctor", "error.patient", "Лікар не обраний або не існує.");
+            model.addAttribute("doctors", doctorRepo.findAll());
+            return "patient-record";
+        }
+
+        // Завантаження лікаря з бази
+        PersonalModel doctor = doctorRepo.findById(doctorId).orElse(null);
+        patient.setDoctor(doctor); // Встановлюємо повноцінний об'єкт
+
+        // Зберігаємо пацієнта
         patientRepo.save(patient);
+
         redirectAttributes.addFlashAttribute("successMessage", "Пацієнта успішно додано!");
         return "redirect:/patients/add";
     }

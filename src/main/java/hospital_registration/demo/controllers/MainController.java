@@ -72,7 +72,7 @@ public class MainController {
             String position = loggedInUser.get().getPosition();
             if ("Головний лікар".equalsIgnoreCase(position)) {
                 return "redirect:/MainDoctorHome";
-            } else if ("Медсестра".equalsIgnoreCase(position)) {
+            } else if ("Медсестра/Медбрат".equalsIgnoreCase(position)) {
                 return "redirect:/NurseHome";
             }else if ("Лікар".equalsIgnoreCase(position)) {
                 return "redirect:/DoctorHome";

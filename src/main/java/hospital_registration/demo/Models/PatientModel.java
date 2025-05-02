@@ -41,12 +41,21 @@ public class PatientModel {
     private String notes;
 
     @NotNull(message = "Дата прийому не може бути порожньою")
-    private LocalDateTime appointmentDate; // Дата прийому пацієнта лікарем
+    private LocalDateTime appointmentDateFrom; // Дата запису пацієнта лікарем
+
+    @NotNull(message = "Дата виписки не може бути порожньою")
+    private LocalDateTime appointmentDateTo; // Дата виписування пацієнта лікарем
+
+    @NotNull(message = "Департамент не додано")
+    private String department; //
+
+    @NotNull(message = "Поле 'Ліжко' не може бути порожньою")
+    private Integer bed;
 
     public PatientModel() {
     }
 
-    public PatientModel(String fullName, String phone, String diagnosis, LocalDate birthDate, Integer ward, PersonalModel doctor, String notes, LocalDateTime appointmentDate) {
+    public PatientModel(String fullName, String phone, String diagnosis, LocalDate birthDate, Integer ward, PersonalModel doctor, String notes, String department , LocalDateTime appointmentDateFrom,LocalDateTime appointmentDateTo, Integer bed) {
         this.fullName = fullName;
         this.phone = phone;
         this.diagnosis = diagnosis;
@@ -54,7 +63,10 @@ public class PatientModel {
         this.ward = ward;
         this.doctor = doctor;
         this.notes = notes;
-        this.appointmentDate = appointmentDate;
+        this.appointmentDateFrom = appointmentDateFrom;
+        this.appointmentDateTo =appointmentDateTo;
+        this.department = department;
+        this.bed = bed;
     }
 
     // Гетери та сетери
@@ -82,6 +94,15 @@ public class PatientModel {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
-    public LocalDateTime getAppointmentDate() { return appointmentDate; }
-    public void setAppointmentDate(LocalDateTime appointmentDate) { this.appointmentDate = appointmentDate; }
+    public LocalDateTime getAppointmentDateFrom() { return appointmentDateFrom; }
+    public void setAppointmentDateFrom(LocalDateTime appointmentDateFrom) { this.appointmentDateFrom = appointmentDateFrom; }
+
+    public LocalDateTime getAppointmentDateTo() { return appointmentDateTo; }
+    public void setAppointmentDateTo(LocalDateTime appointmentDateTo) { this.appointmentDateTo = appointmentDateTo; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public Integer getBed() { return bed; }
+    public void setBed(Integer bed) { this.bed = bed; }
 }
