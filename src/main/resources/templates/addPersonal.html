@@ -26,8 +26,23 @@
 
     <div class="mb-3">
       <label class="form-label">Положення:</label>
-      <input type="text" th:field="*{position}" class="form-control" required>
+      <select th:field="*{position}" class="form-control" required>
+        <option value="Лікар" >Лікар</option>
+        <option value="Медсестра/Медбрат" >Медсестра/Медбрат</option>
+      </select>
       <div class="text-danger" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Спеціалізація:</label>
+      <select th:field="*{specialty}" class="form-select" required>
+        <option value="" disabled selected>Оберіть положення</option>
+        <option value="Травматолог">Травматолог</option>
+        <option value="Невролог">Невролог</option>
+        <option value="Хірург">Хірург</option>
+        <option value="Кардіолог">Кардіолог</option>
+      </select>
+      <div class="text-danger" th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}"></div>
     </div>
 
     <div class="mb-3">

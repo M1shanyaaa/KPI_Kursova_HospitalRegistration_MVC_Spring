@@ -40,20 +40,46 @@
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Відділення:</label>
+            <select th:field="*{department}" class="form-select" required>
+                <option value="" disabled selected>Оберіть відділення</option>
+                <option value="Кардіологія">Кардіологія</option>
+                <option value="Травматологія">Травматологія</option>
+                <option value="Неврологія">Неврологія</option>
+                <option value="Хірургія">Хірургія</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label">Палата:</label>
             <input type="number" th:field="*{ward}" class="form-control" required>
         </div>
 
         <div class="mb-3">
+            <label class="form-label">Ліжко:</label>
+            <input type="number" th:field="*{bed}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label">Лікар:</label>
             <select th:field="*{doctor}" class="form-select" required>
-                <option th:each="doctor : ${doctors}" th:value="${doctor.id}" th:text="${doctor.full_name}"></option>
+                <option value="" disabled selected>Оберіть лікаря</option>
+                <option th:each="doctor : ${doctors}"
+                        th:if="${doctor.position == 'Лікар' or doctor.position == 'Головний лікар'}"
+                        th:value="${doctor.id}"
+                        th:text="${doctor.full_name + ' (' + doctor.specialty + ')'}">
+                </option>
             </select>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Дата прийому лікарем:</label>
-            <input type="datetime-local" th:field="*{appointmentDate}" class="form-control" required>
+            <label class="form-label">Дата запису пацієнта:</label>
+            <input type="datetime-local" th:field="*{appointmentDateFrom}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Дата виписки пацієнта:</label>
+            <input type="datetime-local" th:field="*{appointmentDateTo}" class="form-control" required>
         </div>
 
         <div class="mb-3">
