@@ -11,40 +11,37 @@ public class PersonalModel {
     private Long id;
 
     @NotBlank(message = "Ім'я не може бути порожнім")
-    private String full_name;
+    private String fullName;
 
     @NotBlank(message = "Логін не може бути порожнім")
-    @Column(unique = true)  // Додаємо унікальність для логіну
+    @Column(unique = true)
     private String login;
 
     @NotNull(message = "Номер телефону не може бути порожнім")
     @Min(value = 100000000, message = "Некоректний номер телефону")
-    private Integer phone = 0; // Значення за замовчуванням, щоб уникнути null
+    private Integer phone = 0;
 
     @NotBlank(message = "Позиція не може бути порожньою")
     private String position;
 
-    @NotBlank(message = "Спеціалазація не може бути порожньою")
+    @NotBlank(message = "Спеціалізація не може бути порожньою")
     private String specialty;
 
     @NotBlank(message = "Пароль не може бути порожнім")
     private String access_key;
 
-    // Конструктор без параметрів
     public PersonalModel() {
     }
 
-    // Конструктор із параметрами
-    public PersonalModel(String full_name, String login, Integer phone, String position, String specialty, String access_key) {
-        this.full_name = full_name;
+    public PersonalModel(String fullName, String login, Integer phone, String position, String specialty, String access_key) {
+        this.fullName = fullName;
         this.login = login;
-        this.phone = (phone != null) ? phone : 0; // Захист від null
+        this.phone = (phone != null) ? phone : 0;
         this.position = position;
-        this.access_key = access_key;
         this.specialty = specialty;
+        this.access_key = access_key;
     }
 
-    // Гетери та сетери
     public Long getId() {
         return id;
     }
@@ -53,12 +50,12 @@ public class PersonalModel {
         this.id = id;
     }
 
-    public String getFull_name() {
-        return full_name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getLogin() {
@@ -70,11 +67,11 @@ public class PersonalModel {
     }
 
     public Integer getPhone() {
-        return (phone != null) ? phone : 0; // Захист від null
+        return phone;
     }
 
     public void setPhone(Integer phone) {
-        this.phone = (phone != null) ? phone : 0; // Захист від null
+        this.phone = (phone != null) ? phone : 0;
     }
 
     public String getPosition() {
@@ -96,8 +93,8 @@ public class PersonalModel {
     public String getSpecialty() {
         return specialty;
     }
+
     public void setSpecialty(String specialty) {
         this.specialty = specialty;
     }
-
 }

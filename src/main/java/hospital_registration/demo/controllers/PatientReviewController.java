@@ -69,4 +69,21 @@ public class PatientReviewController {
         redirectAttributes.addFlashAttribute("message", "Пацієнта " + patient.getFullName() + " було виписано (видалено).");
         return "redirect:/DoctorHome/dashboard/" + doctorId;
     }
+
+    @GetMapping("/AllReviewMainDoctor")
+    public String getAllPatientsForMainDoctor(HttpSession session, Model model) {
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/";
+        }
+
+        List<PatientModel> allPatients = patientRepo.findAll();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+
+        model.addAttribute("patients", allPatients);
+        model.addAttribute("formatter", formatter);
+        model.addAttribute("user", loggedInUser);
+
+        return "pations-review-maindoctor"; // ⬅️ новий шаблон
+    }
 }

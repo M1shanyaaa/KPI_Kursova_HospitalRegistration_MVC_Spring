@@ -58,6 +58,7 @@
       <th>Нотатки</th>
       <th>Дата прийому</th>
       <th>Дата виписки</th>
+      <th>Лікар</th> <!-- Додано новий стовпець для лікаря -->
       <th>Дії</th>
     </tr>
     </thead>
@@ -70,6 +71,7 @@
       <td th:text="${patient.notes}"></td>
       <td th:text="${patient.appointmentDateFrom.format(formatter)}"></td>
       <td th:text="${patient.appointmentDateTo.format(formatter)}"></td>
+      <td th:text="${patient.doctor.fullName}"></td>
       <td>
         <button type="button"
                 class="btn btn-sm btn-warning"
