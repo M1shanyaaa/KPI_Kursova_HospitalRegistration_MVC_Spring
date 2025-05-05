@@ -1,0 +1,42 @@
+<div th:fragment="header">
+  <style>
+    .header-bar {
+      background-color: #0d6efd;
+      color: white;
+      border-bottom: 3px solid #084298;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-bar .nav-link {
+      color: white !important;
+      font-weight: 500;
+    }
+
+    .header-bar .nav-link:hover {
+      text-decoration: underline;
+      color: #dbe9ff !important;
+    }
+
+    .header-bar .fw-bold {
+      color: white;
+    }
+  </style>
+
+  <div class="container-fluid header-bar">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 px-4">
+      <div class="d-flex align-items-center">
+        <a href="/" class="d-inline-flex text-decoration-none">
+          <img th:src="@{/images/10469-hospital.png}" alt="Hospital Logo" width="40" height="40" class="me-2">
+        </a>
+        <span class="fs-5 fw-bold">Hospital Registration</span>
+      </div>
+
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        <li><a href="/DoctorHome/dashboard/1" class="nav-link px-3">Інформація про записи</a></li>
+        <li><a href="/account" class="nav-link px-3">Акаунт</a></li>
+        <li><a href="/" class="nav-link px-3">Вихід</a></li>
+      </ul>
+    </header>
+  </div>
+</div>
+

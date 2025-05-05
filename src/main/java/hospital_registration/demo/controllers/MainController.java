@@ -23,20 +23,6 @@ public class MainController {
         this.personalRepo = personalRepo;
     }
 
-    /**
-     * Displays the home page.
-     *
-     * @param model   the model to add attributes to
-     * @param session the HTTP session to check user authentication
-     * @return the name of the home view or redirect to login if not authenticated
-     */
-    @GetMapping("/MainDoctorHome")
-    public String home(Model model, HttpSession session) {
-        if (session.getAttribute("loggedInUser") == null) {
-            return "redirect:/"; // Redirect to login if user is not authenticated
-        }
-        return "home";
-    }
 
     /**
      * Displays the login page.

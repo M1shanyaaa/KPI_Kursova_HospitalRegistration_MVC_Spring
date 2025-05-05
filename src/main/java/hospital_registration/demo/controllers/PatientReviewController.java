@@ -1,7 +1,9 @@
 package hospital_registration.demo.controllers;
 
 import hospital_registration.demo.Models.PatientModel;
+import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PatientRepo;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -23,15 +25,20 @@ public class PatientReviewController {
     private PatientRepo patientRepo;
 
     @GetMapping("/DoctorHome/dashboard/{id}")
-    public String getDoctorDashboard(Model model, @PathVariable Long id) {
-        List<PatientModel> patients = patientRepo.findByDoctor_Id(id);
+    public String getDoctorDashboard(@PathVariable Long id, HttpSession session, Model model) {
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/";
+        }
 
+        List<PatientModel> patients = patientRepo.findByDoctor_Id(id);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
         model.addAttribute("patients", patients);
-        model.addAttribute("formatter", formatter); // Додаємо форматтер у модель
+        model.addAttribute("formatter", formatter);
+        model.addAttribute("user", loggedInUser); // 👈 передаємо з сесії
 
-        return "pations_review_dashboard";
+        return "pations-review-dashboard";
     }
 
     // Форма для редагування дати виписки

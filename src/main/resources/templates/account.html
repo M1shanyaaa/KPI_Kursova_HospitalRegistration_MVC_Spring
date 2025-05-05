@@ -8,7 +8,8 @@
 
 <!-- Динамічне вставлення хедера залежно від посади -->
 <header th:if="${user.position.equalsIgnoreCase('Головний лікар')}" th:insert="~{blocks/MainDoctorheader :: header}"></header>
-<header th:if="${user.position.equalsIgnoreCase('Медсестра')}" th:insert="~{blocks/Nurseheader :: header}"></header>
+<header th:if="${user.position.equalsIgnoreCase('Лікар')}" th:insert="~{blocks/Doctorheader :: header}"></header>
+<header th:if="${user.position.equalsIgnoreCase('Медсестра/Медбрат')}" th:insert="~{blocks/Nurseheader :: header}"></header>
 
 <div class="container mt-5">
   <h2 th:text="${isOwnAccount} ? 'Мій акаунт' : 'Акаунт працівника'">Акаунт</h2>

@@ -7,10 +7,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class NurseController {
+public class MainDoctorController {
 
-
-    @GetMapping("/NurseHome")
+    @GetMapping("/MainDoctorHome")
     public String NurseHome(Model model, HttpSession session) {
         PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
         if (session.getAttribute("loggedInUser") == null) {
@@ -19,5 +18,4 @@ public class NurseController {
         model.addAttribute("user", user);
         return "home";
     }
-
 }

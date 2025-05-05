@@ -36,7 +36,8 @@
     </style>
 </head>
 <body>
-<header th:insert="~{blocks/MainDoctorheader :: header}"></header>
+<header th:if="${user.position.equalsIgnoreCase('Головний лікар')}" th:insert="~{blocks/MainDoctorheader :: header}"></header>
+<header th:if="${user.position.equalsIgnoreCase('Лікар')}" th:insert="~{blocks/Doctorheader :: header}"></header>
 
 <div class="text-center mt-5">
     <h1 class="mb-4">Сервіс реєстрації хворих</h1>
