@@ -20,7 +20,7 @@ public class AddPersonalController {
 
     @GetMapping("/addPersonal")
     public String showAddPersonalForm(Model model) {
-        model.addAttribute("person", new PersonalModel()); // Виправлено ім'я атрибута
+        model.addAttribute("person", new PersonalModel());
         return "addPersonal";
     }
 
@@ -45,6 +45,6 @@ public class AddPersonalController {
         // Якщо логін унікальний, зберігаємо персонал
         personalRepo.save(person);
         redirectAttributes.addFlashAttribute("successMessage", "Медичний персонал успішно додано!");
-        return "redirect:/addPersonal"; // Виправлено шлях
+        return "redirect:/addPersonal";
     }
 }
