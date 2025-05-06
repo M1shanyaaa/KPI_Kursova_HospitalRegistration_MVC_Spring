@@ -36,7 +36,7 @@ public class PatientReviewController {
 
         model.addAttribute("patients", patients);
         model.addAttribute("formatter", formatter);
-        model.addAttribute("user", loggedInUser); // 👈 передаємо з сесії
+        model.addAttribute("user", loggedInUser);
 
         return "pations-review-dashboard";
     }
@@ -84,6 +84,6 @@ public class PatientReviewController {
         model.addAttribute("formatter", formatter);
         model.addAttribute("user", loggedInUser);
 
-        return "pations-review-maindoctor"; // ⬅️ новий шаблон
+        return "pations-review-maindoctor";
     }
 }
