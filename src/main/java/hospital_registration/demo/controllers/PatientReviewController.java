@@ -1,7 +1,9 @@
 package hospital_registration.demo.controllers;
 
+import hospital_registration.demo.Models.HistoryPatientsModel;
 import hospital_registration.demo.Models.PatientModel;
 import hospital_registration.demo.Models.PersonalModel;
+import hospital_registration.demo.repo.HistoryPatientRepo;
 import hospital_registration.demo.repo.PatientRepo;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ public class PatientReviewController {
 
     @Autowired
     private PatientRepo patientRepo;
+    @Autowired
+    private HistoryPatientRepo historyPatientRepo;
 
     @GetMapping("/DoctorHome/dashboard/{id}")
     public String getDoctorDashboard(@PathVariable Long id, HttpSession session, Model model) {
@@ -64,7 +68,21 @@ public class PatientReviewController {
     @PostMapping("/patients/delete")
     public String deletePatient(@RequestParam Long patientId, RedirectAttributes redirectAttributes) {
         PatientModel patient = patientRepo.findById(patientId).orElseThrow();
+        HistoryPatientsModel pastPatient = new HistoryPatientsModel(
+                patient.getFullName(),
+                patient.getPhone(),
+                patient.getDiagnosis(),
+                patient.getBirthDate(),
+                patient.getWard(),
+                patient.getDoctor(),
+                patient.getNotes(),
+                patient.getDepartment(),
+                patient.getAppointmentDateFrom(),
+                patient.getAppointmentDateTo(),
+                patient.getBed()
+        );
         Long doctorId = patient.getDoctor().getId();
+        historyPatientRepo.save(pastPatient);
         patientRepo.delete(patient);
         redirectAttributes.addFlashAttribute("message", "Пацієнта " + patient.getFullName() + " було виписано (видалено).");
         return "redirect:/DoctorHome/dashboard/" + doctorId;
