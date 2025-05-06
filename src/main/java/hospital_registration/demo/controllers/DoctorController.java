@@ -13,7 +13,7 @@ public class DoctorController {
     public String NurseHome(Model model, HttpSession session) {
         PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
         if (session.getAttribute("loggedInUser") == null) {
-            return "redirect:/"; // Redirect to login if user is not authenticated
+            return "redirect:/";
         }
         model.addAttribute("user", user);
         return "home";
