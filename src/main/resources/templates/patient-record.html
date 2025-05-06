@@ -67,7 +67,7 @@
                 <option th:each="doctor : ${doctors}"
                         th:if="${doctor.position == 'Лікар' or doctor.position == 'Головний лікар'}"
                         th:value="${doctor.id}"
-                        th:text="${doctor.full_name + ' (' + doctor.specialty + ')'}">
+                        th:text="${doctor.fullName + ' (' + doctor.specialty + ')'}">
                 </option>
             </select>
         </div>

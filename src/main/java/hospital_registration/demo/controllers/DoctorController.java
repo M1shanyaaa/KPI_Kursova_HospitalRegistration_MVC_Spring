@@ -18,4 +18,5 @@ public class DoctorController {
         model.addAttribute("user", user);
         return "home";
     }
+
 }
