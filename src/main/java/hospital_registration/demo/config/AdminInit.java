@@ -16,7 +16,7 @@ public class AdminInit {
             String adminPassword = "admin"; // Початковий пароль (потрібно змінити вручну після першого входу)
 
             if (!personalRepo.existsByPosition("Головний лікар")){
-                PersonalModel admin = new PersonalModel("Рибак Михайло", adminLogin, 300000051, "Головний лікар", "Хірург", adminPassword);
+                PersonalModel admin = new PersonalModel("Рибак Михайло", adminLogin, 960741514, "Головний лікар", "Хірург", adminPassword,"tokariuk.stanislav@lll.kpi.ua");
                 personalRepo.save(admin);
                 System.out.println("Адміністратор створений: Логін - " + adminLogin);
             }

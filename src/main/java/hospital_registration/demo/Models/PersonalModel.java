@@ -30,16 +30,22 @@ public class PersonalModel {
     @NotBlank(message = "Пароль не може бути порожнім")
     private String access_key;
 
+    @NotBlank(message = "Email не може бути порожнім")
+    @Email(message = "Некоректний формат email")
+    @Column(unique = true)
+    private String email;
+
     public PersonalModel() {
     }
 
-    public PersonalModel(String fullName, String login, Integer phone, String position, String specialty, String access_key) {
+    public PersonalModel(String fullName, String login, Integer phone, String position, String specialty, String access_key, String email) {
         this.fullName = fullName;
         this.login = login;
         this.phone = (phone != null) ? phone : 0;
         this.position = position;
         this.specialty = specialty;
         this.access_key = access_key;
+        this.email = email;
     }
 
     public Long getId() {
@@ -96,5 +102,13 @@ public class PersonalModel {
 
     public void setSpecialty(String specialty) {
         this.specialty = specialty;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
