@@ -38,13 +38,11 @@
 <body>
 <header th:if="${user.position.equalsIgnoreCase('Головний лікар')}" th:insert="~{blocks/MainDoctorheader :: header}"></header>
 <header th:if="${user.position.equalsIgnoreCase('Лікар')}" th:insert="~{blocks/Doctorheader :: header}"></header>
-<header th:if="${user.position.equalsIgnoreCase('Медсестра/Медбрат')}" th:insert="~{blocks/Nurseheader :: header}"></header>
 
 <div class="text-center mt-5">
-  <h1 class="mb-4">Сервіс реєстрації хворих</h1>
+  <h1 class="mb-4">Інформація про записаних пацієнтів</h1>
 </div>
 
-<!-- Flash message -->
 <div class="container mt-3" th:if="${message}">
   <div class="alert alert-success text-center" th:text="${message}"></div>
 </div>
@@ -60,7 +58,7 @@
       <th>Нотатки</th>
       <th>Дата прийому</th>
       <th>Дата виписки</th>
-      <th>Лікар</th> <!-- Додано новий стовпець для лікаря -->
+      <th>Лікар</th>
       <th>Дії</th>
     </tr>
     </thead>

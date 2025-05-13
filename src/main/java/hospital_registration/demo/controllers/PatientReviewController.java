@@ -160,15 +160,19 @@ public class PatientReviewController {
         if (loggedInUser == null) {
             return "redirect:/";
         }
-
-
         List<PatientModel> allPatients = patientRepo.findAll();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        if (authService.isDoctor(loggedInUser) || authService.isMainDoctor(loggedInUser) ) {
+            model.addAttribute("patients", allPatients);
+            model.addAttribute("formatter", formatter);
+            model.addAttribute("user", loggedInUser);
+            return "pations-allreview";
+        } else if (authService.isNurse(loggedInUser)) {
+            model.addAttribute("patients", allPatients);
+            model.addAttribute("formatter", formatter);
+            model.addAttribute("user", loggedInUser);
+            return "pations-allreview-nurse";
+        }else{return "redirect:/error";}
 
-        model.addAttribute("patients", allPatients);
-        model.addAttribute("formatter", formatter);
-        model.addAttribute("user", loggedInUser);
-
-        return "pations-allreview";
     }
 }
