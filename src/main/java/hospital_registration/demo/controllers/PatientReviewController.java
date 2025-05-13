@@ -154,17 +154,13 @@ public class PatientReviewController {
         return "redirect:/DoctorHome/dashboard/" + doctorId;
     }
 
-    @GetMapping("/AllReviewMainDoctor")
+    @GetMapping("/AllReview")
     public String getAllPatientsForMainDoctor(HttpSession session, Model model) {
         PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/";
         }
 
-        // Тільки головний лікар має доступ до списку всіх пацієнтів
-        if (!authService.hasMainDoctorAccess(loggedInUser)) {
-            return "redirect:/access-denied";
-        }
 
         List<PatientModel> allPatients = patientRepo.findAll();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
@@ -173,6 +169,6 @@ public class PatientReviewController {
         model.addAttribute("formatter", formatter);
         model.addAttribute("user", loggedInUser);
 
-        return "pations-review-maindoctor";
+        return "pations-allreview";
     }
 }
