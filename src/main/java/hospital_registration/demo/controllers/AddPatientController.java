@@ -4,6 +4,8 @@ import hospital_registration.demo.Models.PatientModel;
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PatientRepo;
 import hospital_registration.demo.repo.PersonalRepo;
+import hospital_registration.demo.service.AuthorizationService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,8 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/patients")
@@ -22,13 +22,20 @@ public class AddPatientController {
     private final PersonalRepo doctorRepo;
 
     @Autowired
+    private AuthorizationService authService;
+
+    @Autowired
     public AddPatientController(PatientRepo patientRepo, PersonalRepo doctorRepo) {
         this.patientRepo = patientRepo;
         this.doctorRepo = doctorRepo;
     }
 
     @GetMapping("/add")
-    public String showAddPatientForm(Model model) {
+    public String showAddPatientForm(Model model, HttpSession session) {
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (!authService.hasNurseAccess(loggedInUser)) {
+            return "redirect:/access-denied";
+        }
         model.addAttribute("patient", new PatientModel());
         model.addAttribute("doctors", doctorRepo.findAll());
         return "patient-record";
@@ -39,7 +46,13 @@ public class AddPatientController {
             @Valid @ModelAttribute("patient") PatientModel patient,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes,
+            HttpSession session,
             Model model) {
+
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (!authService.hasNurseAccess(loggedInUser)) {
+            return "redirect:/access-denied";
+        }
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("doctors", doctorRepo.findAll());

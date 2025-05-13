@@ -2,6 +2,7 @@ package hospital_registration.demo.controllers;
 
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.Models.PersonalModel;
+import hospital_registration.demo.service.AuthorizationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,12 +18,13 @@ import java.util.Optional;
 public class MainController {
 
     private final PersonalRepo personalRepo;
+    private final AuthorizationService authService;
 
     @Autowired
-    public MainController(PersonalRepo personalRepo) {
+    public MainController(PersonalRepo personalRepo, AuthorizationService authService) {
         this.personalRepo = personalRepo;
+        this.authService = authService;
     }
-
 
     /**
      * Displays the login page.
@@ -34,7 +36,7 @@ public class MainController {
     @GetMapping("/")
     public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
         if (error != null) {
-            model.addAttribute("errorMessage", "Invalid login or password");
+            model.addAttribute("errorMessage", "Невірний логін або пароль");
         }
         return "login-page";
     }
@@ -49,25 +51,24 @@ public class MainController {
      */
     @PostMapping("/")
     public String login(@ModelAttribute PersonalModel maindoctor, Model model, HttpSession session) {
-        Optional<PersonalModel> loggedInUser = personalRepo.findByLogin(maindoctor.getLogin());
+        Optional<PersonalModel> userOptional = personalRepo.findByLogin(maindoctor.getLogin());
 
-        if (loggedInUser.isPresent() && loggedInUser.get().getAccess_key().equals(maindoctor.getAccess_key())) {
-            session.setAttribute("loggedInUser", loggedInUser.get());
+        if (userOptional.isPresent() && userOptional.get().getAccess_key().equals(maindoctor.getAccess_key())) {
+            PersonalModel loggedInUser = userOptional.get();
+            session.setAttribute("loggedInUser", loggedInUser);
 
-            // Redirect based on user position
-            String position = loggedInUser.get().getPosition();
-            if ("Головний лікар".equalsIgnoreCase(position)) {
+            // Перенаправлення в залежності від ролі користувача
+            if (authService.isMainDoctor(loggedInUser)) {
                 return "redirect:/MainDoctorHome";
-            } else if ("Медсестра/Медбрат".equalsIgnoreCase(position)) {
-                return "redirect:/NurseHome";
-            }else if ("Лікар".equalsIgnoreCase(position)) {
+            } else if (authService.isDoctor(loggedInUser)) {
                 return "redirect:/DoctorHome";
+            } else if (authService.isNurse(loggedInUser)) {
+                return "redirect:/NurseHome";
             }
         }
 
-        return "redirect:/?error=true"; // Authentication failed
+        return "redirect:/?error=true"; // Автентифікація не вдалася
     }
-
 
     /**
      * Logs out the current user and invalidates the session.

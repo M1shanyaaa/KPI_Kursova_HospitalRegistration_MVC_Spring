@@ -2,6 +2,7 @@ package hospital_registration.demo.controllers;
 
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PersonalRepo;
+import hospital_registration.demo.service.AuthorizationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,8 @@ public class AccountController {
 
     @Autowired
     private PersonalRepo personalRepo;
+    @Autowired
+    private AuthorizationService authService;
 
     // Власний акаунт
     @GetMapping("/account")
@@ -35,10 +38,14 @@ public class AccountController {
         if (loggedInUser == null) {
             return "redirect:/";
         }
+        if (!authService.hasMainDoctorAccess(loggedInUser)) {
+            return "redirect:/access-denied";
+        }
+
 
         PersonalModel user = personalRepo.findById(id).orElse(null);
         if (user == null) {
-            return "redirect:/error"; // або своя кастомна сторінка
+            return "redirect:/error";
         }
 
         boolean isOwnAccount = loggedInUser.getId().equals(user.getId());
