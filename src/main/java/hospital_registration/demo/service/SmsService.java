@@ -19,8 +19,9 @@ public class SmsService {
         helper.setFrom("Реєстратура Лікарні <hospitalregistrat1on69@gmail.com>");
         helper.setTo(toEmail);
         helper.setSubject(subject);
-        helper.setText("<h3>" + subject + "</h3><p>" + body + "</p>", true); // HTML
+        helper.setText("<h3>" + subject + "</h3><p>" + body + "</p>", true);
 
         mailSender.send(message);
     }
 }
+
