@@ -4,6 +4,7 @@ import hospital_registration.demo.Models.Announcement;
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.AnnouncementRepository;
 import hospital_registration.demo.repo.PersonalRepo;
+import hospital_registration.demo.service.AuthorizationService;
 import hospital_registration.demo.service.SmsService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -30,9 +31,17 @@ public class AddAnnouncementController {
     @Autowired
     private SmsService smsService;
 
+    @Autowired
+    private AuthorizationService authService;
+
     @GetMapping("/addAnnouncement")
-    public String showAddAnnouncementForm(Model model) {
+    public String showAddAnnouncementForm(Model model, HttpSession session) {
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (!authService.hasMainDoctorAccess(loggedInUser)) {
+            return "redirect:/access-denied";
+        }
         model.addAttribute("announcement", new Announcement());
+
         return "announ-form";
     }
 
@@ -40,8 +49,13 @@ public class AddAnnouncementController {
     public String addAnnouncement(
             @Valid @ModelAttribute("announcement") Announcement announcement,
             BindingResult bindingResult,
-            RedirectAttributes redirectAttributes,
+            RedirectAttributes redirectAttributes,HttpSession session,
             Model model) {
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+
+        if (!authService.hasMainDoctorAccess(loggedInUser)) {
+            return "redirect:/access-denied";
+        }
 
         if (bindingResult.hasErrors()) {
             return "announ-form";
