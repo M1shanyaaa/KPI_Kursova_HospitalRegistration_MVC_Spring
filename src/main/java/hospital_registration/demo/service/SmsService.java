@@ -6,12 +6,27 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+/**
+ * Сервіс для надсилання email-повідомлень, що імітують SMS-повідомлення (наприклад, через шлюз email-to-SMS).
+ * Може використовуватись для сповіщення пацієнтів або персоналу.
+ */
 @Service
 public class SmsService {
 
+    /**
+     * Компонент для відправки email-повідомлень.
+     */
     @Autowired
     private JavaMailSender mailSender;
 
+    /**
+     * Надсилає email на вказану адресу з темою та HTML-текстом.
+     *
+     * @param toEmail  Адреса одержувача
+     * @param subject  Тема повідомлення
+     * @param body     Основний вміст повідомлення у вигляді HTML
+     * @throws Exception якщо виникає помилка при формуванні або надсиланні повідомлення
+     */
     public void sendEmail(String toEmail, String subject, String body) throws Exception {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -24,4 +39,3 @@ public class SmsService {
         mailSender.send(message);
     }
 }
-

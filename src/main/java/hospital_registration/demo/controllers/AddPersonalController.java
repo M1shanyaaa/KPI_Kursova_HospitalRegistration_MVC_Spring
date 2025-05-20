@@ -14,6 +14,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Optional;
 
+/**
+ * Контролер для додавання нового медичного персоналу.
+ * Доступ дозволено лише головному лікарю.
+ */
 @Controller
 public class AddPersonalController {
 
@@ -23,6 +27,14 @@ public class AddPersonalController {
     @Autowired
     private AuthorizationService authService;
 
+    /**
+     * Відображає форму для створення нового працівника лікарні.
+     * Перевіряє, чи користувач має права головного лікаря.
+     *
+     * @param model   модель для передачі даних до представлення
+     * @param session HTTP-сесія для ідентифікації користувача
+     * @return сторінка з формою або редірект на сторінку доступу
+     */
     @GetMapping("/addPersonal")
     public String showAddPersonalForm(Model model, HttpSession session) {
         PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
@@ -30,7 +42,6 @@ public class AddPersonalController {
             return "redirect:/";
         }
 
-        // Тільки головний лікар може додавати персонал
         if (!authService.hasMainDoctorAccess(loggedInUser)) {
             return "redirect:/access-denied";
         }
@@ -40,6 +51,17 @@ public class AddPersonalController {
         return "addPersonal";
     }
 
+    /**
+     * Обробляє надсилання форми для додавання нового працівника.
+     * Перевіряє валідацію даних і унікальність логіна.
+     *
+     * @param person             новий об'єкт персоналу, заповнений із форми
+     * @param bindingResult      результат валідації
+     * @param redirectAttributes повідомлення після редіректу
+     * @param session            HTTP-сесія для перевірки доступу
+     * @param model              модель для передачі даних у представлення
+     * @return редірект на сторінку успіху або форма з помилками
+     */
     @PostMapping("/addPersonal")
     public String addPersonal(
             @Valid @ModelAttribute("person") PersonalModel person,
@@ -53,7 +75,6 @@ public class AddPersonalController {
             return "redirect:/";
         }
 
-        // Тільки головний лікар може додавати персонал
         if (!authService.hasMainDoctorAccess(loggedInUser)) {
             return "redirect:/access-denied";
         }
@@ -63,17 +84,18 @@ public class AddPersonalController {
             return "addPersonal";
         }
 
-        // Перевірка на унікальність логіна
+        // Перевірка, чи логін уже зайнятий
         Optional<PersonalModel> existingPerson = personalRepo.findByLogin(person.getLogin());
         if (existingPerson.isPresent()) {
             model.addAttribute("errorMessage", "Цей логін вже існує. Виберіть інший логін.");
             model.addAttribute("user", loggedInUser);
-            return "addPersonal"; // Повертаємо на ту саму сторінку з повідомленням
+            return "addPersonal";
         }
 
-        // Якщо логін унікальний, зберігаємо персонал
+        // Збереження нового працівника
         personalRepo.save(person);
         redirectAttributes.addFlashAttribute("successMessage", "Медичний персонал успішно додано!");
         return "redirect:/addPersonal";
     }
 }
+

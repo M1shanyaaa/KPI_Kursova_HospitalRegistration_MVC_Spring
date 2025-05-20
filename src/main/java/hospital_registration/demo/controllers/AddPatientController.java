@@ -14,6 +14,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+/**
+ * Контролер для додавання пацієнтів до системи.
+ * Доступ надається лише медичним сестрам.
+ */
 @Controller
 @RequestMapping("/patients")
 public class AddPatientController {
@@ -24,12 +28,26 @@ public class AddPatientController {
     @Autowired
     private AuthorizationService authService;
 
+    /**
+     * Конструктор із залежностями репозиторіїв пацієнтів та лікарів.
+     *
+     * @param patientRepo репозиторій пацієнтів
+     * @param doctorRepo  репозиторій лікарів
+     */
     @Autowired
     public AddPatientController(PatientRepo patientRepo, PersonalRepo doctorRepo) {
         this.patientRepo = patientRepo;
         this.doctorRepo = doctorRepo;
     }
 
+    /**
+     * Відображає форму для додавання нового пацієнта.
+     * Доступно лише для користувачів із правами медсестри.
+     *
+     * @param model   модель для передачі даних у представлення
+     * @param session HTTP-сесія для перевірки авторизації
+     * @return сторінка з формою або редірект при відсутності доступу
+     */
     @GetMapping("/add")
     public String showAddPatientForm(Model model, HttpSession session) {
         PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
@@ -41,6 +59,17 @@ public class AddPatientController {
         return "patient-record";
     }
 
+    /**
+     * Обробляє відправку форми додавання пацієнта.
+     * Виконує валідацію, перевіряє вибраного лікаря, зберігає пацієнта в базу.
+     *
+     * @param patient             пацієнт, заповнений з форми
+     * @param bindingResult       об'єкт із результатами валідації
+     * @param redirectAttributes  атрибути для передачі повідомлення після редіректу
+     * @param session             HTTP-сесія для перевірки доступу
+     * @param model               модель для повторного показу форми при помилках
+     * @return сторінка з формою або редірект на успішне додавання
+     */
     @PostMapping("/add")
     public String addPatient(
             @Valid @ModelAttribute("patient") PatientModel patient,
@@ -59,7 +88,6 @@ public class AddPatientController {
             return "patient-record";
         }
 
-        // Отримання id лікаря, який передається у формі
         Long doctorId = patient.getDoctor() != null ? patient.getDoctor().getId() : null;
 
         if (doctorId == null || !doctorRepo.existsById(doctorId)) {
@@ -68,11 +96,9 @@ public class AddPatientController {
             return "patient-record";
         }
 
-        // Завантаження лікаря з бази
         PersonalModel doctor = doctorRepo.findById(doctorId).orElse(null);
-        patient.setDoctor(doctor); // Встановлюємо повноцінний об'єкт
+        patient.setDoctor(doctor);
 
-        // Зберігаємо пацієнта
         patientRepo.save(patient);
 
         redirectAttributes.addFlashAttribute("successMessage", "Пацієнта успішно додано!");

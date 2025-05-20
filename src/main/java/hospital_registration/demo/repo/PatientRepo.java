@@ -7,11 +7,26 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * Репозиторій для активних пацієнтів {@link PatientModel}.
+ * Додатково містить методи пошуку пацієнтів за лікарем.
+ */
 @Repository
 public interface PatientRepo extends JpaRepository<PatientModel, Long> {
-    // Пошук пацієнтів за лікарем
+
+    /**
+     * Знаходить усіх пацієнтів, прикріплених до певного лікаря.
+     *
+     * @param doctor екземпляр {@link PersonalModel}
+     * @return список пацієнтів
+     */
     List<PatientModel> findByDoctor(PersonalModel doctor);
 
-    // Пошук пацієнтів за ID лікаря
+    /**
+     * Знаходить пацієнтів за ID лікаря.
+     *
+     * @param doctorId ID лікаря
+     * @return список пацієнтів
+     */
     List<PatientModel> findByDoctor_Id(Long doctorId);
 }
