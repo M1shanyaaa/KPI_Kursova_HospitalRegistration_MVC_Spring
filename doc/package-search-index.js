@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"hospital_registration.demo"},{"l":"hospital_registration.demo.config"},{"l":"hospital_registration.demo.controllers"},{"l":"hospital_registration.demo.Models"},{"l":"hospital_registration.demo.repo"},{"l":"hospital_registration.demo.service"}];updateSearchResults();
