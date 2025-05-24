@@ -3,6 +3,7 @@ package hospital_registration.demo.controllers;
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.service.AuthorizationService;
+import hospital_registration.demo.service.PasswordService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,33 +13,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 /**
- * Контролер для обробки запитів на головну сторінку,
- * автентифікації користувачів та виходу із системи.
+ * Controller for handling requests to the main page.
  */
 @Controller
 public class MainController {
 
     private final PersonalRepo personalRepo;
     private final AuthorizationService authService;
+    private final PasswordService passwordService;
 
-    /**
-     * Конструктор контролера з інжекцією залежностей.
-     *
-     * @param personalRepo репозиторій персоналу
-     * @param authService сервіс авторизації
-     */
     @Autowired
-    public MainController(PersonalRepo personalRepo, AuthorizationService authService) {
+    public MainController(PersonalRepo personalRepo, AuthorizationService authService, PasswordService passwordService) {
         this.personalRepo = personalRepo;
         this.authService = authService;
+        this.passwordService = passwordService;
     }
 
     /**
-     * Відображає сторінку входу в систему.
+     * Displays the login page.
      *
-     * @param error повідомлення про помилку, якщо таке є
-     * @param model модель для передачі атрибутів у представлення
-     * @return ім'я шаблону сторінки входу
+     * @param error optional error message
+     * @param model the model to add attributes to
+     * @return the name of the login view
      */
     @GetMapping("/")
     public String loginPage(@RequestParam(value = "error", required = false) String error, Model model) {
@@ -49,26 +45,24 @@ public class MainController {
     }
 
     /**
-     * Обробляє вхід користувача.
-     * Перевіряє логін та пароль, зберігає користувача в сесії,
-     * та перенаправляє відповідно до його ролі.
+     * Processes the login request.
      *
-     * @param maindoctor об'єкт персоналу з введеними даними
-     * @param model модель для передачі атрибутів
-     * @param session HTTP-сесія для зберігання авторизованого користувача
-     * @return редірект на домашню сторінку або назад на вхід при помилці
+     * @param maindoctor the model object containing login information
+     * @param model      the model to add attributes to
+     * @param session    the HTTP session to store authenticated user
+     * @return redirect to respective home page if successful, otherwise back to login with error
      */
     @PostMapping("/")
     public String login(@ModelAttribute PersonalModel maindoctor, Model model, HttpSession session) {
         Optional<PersonalModel> userOptional = personalRepo.findByLogin(maindoctor.getLogin());
 
-        if (userOptional.isPresent() &&
-                userOptional.get().getAccess_key().equals(maindoctor.getAccess_key())) {
 
+        if ((userOptional.isPresent() && userOptional.get().getAccess_key().equals(maindoctor.getAccess_key())) ||
+        (userOptional.isPresent() && userOptional.get().getAccess_key().equals(passwordService.encodePassword(maindoctor.getAccess_key()))))  {
             PersonalModel loggedInUser = userOptional.get();
             session.setAttribute("loggedInUser", loggedInUser);
 
-            // Перенаправлення відповідно до ролі
+            // Перенаправлення в залежності від ролі користувача
             if (authService.isMainDoctor(loggedInUser)) {
                 return "redirect:/MainDoctorHome";
             } else if (authService.isDoctor(loggedInUser)) {
@@ -78,20 +72,18 @@ public class MainController {
             }
         }
 
-        // Невдала автентифікація
-        return "redirect:/?error=true";
+        return "redirect:/?error=true"; // Автентифікація не вдалася
     }
 
     /**
-     * Вихід користувача з системи.
-     * Очищує сесію і перенаправляє на сторінку входу.
+     * Logs out the current user and invalidates the session.
      *
-     * @param session HTTP-сесія для завершення
-     * @return редірект на сторінку входу
+     * @param session the HTTP session to invalidate
+     * @return redirect to login page
      */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/";
+        return "redirect:/"; // Logout and redirect to login page
     }
 }
