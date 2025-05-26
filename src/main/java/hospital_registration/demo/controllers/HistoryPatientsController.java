@@ -1,7 +1,6 @@
 package hospital_registration.demo.controllers;
 
 import hospital_registration.demo.Models.HistoryPatientsModel;
-
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.HistoryPatientRepo;
 import jakarta.servlet.http.HttpSession;
@@ -18,14 +17,35 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Контролер для обробки запитів, пов'язаних з історією пацієнтів.
+ * Надає можливість переглядати історію пацієнтів та здійснювати пошук за різними параметрами.
+ */
 @Controller
 public class HistoryPatientsController {
+
+    /** Репозиторій для доступу до даних історії пацієнтів */
     private final HistoryPatientRepo historyPatientRepo;
 
+    /**
+     * Конструктор контролера HistoryPatientsController.
+     *
+     * @param historyPatientRepo репозиторій історії пацієнтів
+     */
     public HistoryPatientsController(HistoryPatientRepo historyPatientRepo) {
         this.historyPatientRepo = historyPatientRepo;
     }
 
+    /**
+     * Обробляє GET-запити на сторінку історії пацієнтів.
+     * Дозволяє переглядати всі записи або фільтрувати їх за заданими критеріями.
+     *
+     * @param model модель для передачі даних у шаблон
+     * @param session поточна сесія користувача
+     * @param searchTerm рядок пошуку (необов'язковий)
+     * @param searchType тип пошуку (наприклад: name, phone, diagnosis, dischargeDATE, recordedDATE, all)
+     * @return назва шаблону для рендерингу (history-patients або редірект на головну сторінку)
+     */
     @GetMapping("/historypatients")
     public String getHistory(Model model, HttpSession session,
                              @RequestParam(value = "search", required = false) String searchTerm,
@@ -33,8 +53,8 @@ public class HistoryPatientsController {
         if (session.getAttribute("loggedInUser") == null) {
             return "redirect:/";
         }
+
         PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
-        // Визначаємо чи є пошуковий запит
         boolean hasSearchTerm = searchTerm != null && !searchTerm.trim().isEmpty();
         String cleanSearchTerm = hasSearchTerm ? searchTerm.trim() : "";
 
@@ -47,6 +67,13 @@ public class HistoryPatientsController {
         return "history-patients";
     }
 
+    /**
+     * Повертає список пацієнтів, відфільтрованих за заданим типом пошуку та пошуковим запитом.
+     *
+     * @param searchTerm текст пошуку
+     * @param searchType тип пошуку (наприклад: name, phone, diagnosis, dischargeDATE, recordedDATE, all)
+     * @return список пацієнтів, що відповідають критеріям пошуку
+     */
     private List<HistoryPatientsModel> getFilteredPatientsForAllUsers(String searchTerm, String searchType) {
         switch (searchType) {
             case "name":
@@ -63,7 +90,7 @@ public class HistoryPatientsController {
                     LocalDateTime to = date.atTime(LocalTime.MAX);
                     return historyPatientRepo.findByDischargeDate(from, to);
                 } catch (DateTimeParseException e) {
-                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
+                    // Якщо введено не дату — повернути порожній список
                     return new ArrayList<>();
                 }
             case "recordedDATE":
@@ -74,7 +101,6 @@ public class HistoryPatientsController {
                     LocalDateTime to = date.atTime(LocalTime.MAX);
                     return historyPatientRepo.findByRecordedDate(from, to);
                 } catch (DateTimeParseException e) {
-                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
                     return new ArrayList<>();
                 }
             case "all":
@@ -91,4 +117,3 @@ public class HistoryPatientsController {
         }
     }
 }
-

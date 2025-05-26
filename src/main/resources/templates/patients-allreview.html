@@ -82,6 +82,7 @@
       <tr>
         <th>#</th>
         <th>Ім'я пацієнта</th>
+        <th>Рік народження</th> <!-- Додали новий стовпець -->
         <th>Телефон</th>
         <th>Діагноз</th>
         <th>Нотатки</th>
@@ -95,6 +96,7 @@
       <tr th:each="patient : ${patients}">
         <td th:text="${patient.id}"></td>
         <td th:text="${patient.fullName}"></td>
+        <td th:text="${#temporals.format(patient.birthDate, 'dd.MM.yyyy')}"></td>
         <td th:text="${patient.phone}"></td>
         <td th:text="${patient.diagnosis}"></td>
         <td th:text="${patient.notes}"></td>

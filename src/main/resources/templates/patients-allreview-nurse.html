@@ -80,24 +80,41 @@
             <tr>
                 <th>#</th>
                 <th>Ім'я пацієнта</th>
+                <th>Рік народження</th> <!-- Додали новий стовпець -->
                 <th>Телефон</th>
                 <th>Діагноз</th>
                 <th>Нотатки</th>
                 <th>Дата прийому</th>
                 <th>Дата виписки</th>
                 <th>Лікар</th>
+                <th>Дії</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="patient : ${patients}">
                 <td th:text="${patient.id}"></td>
                 <td th:text="${patient.fullName}"></td>
+                <td th:text="${#temporals.format(patient.birthDate, 'dd.MM.yyyy')}"></td> <!-- Рік народження -->
                 <td th:text="${patient.phone}"></td>
                 <td th:text="${patient.diagnosis}"></td>
                 <td th:text="${patient.notes}"></td>
                 <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${patient.doctor.fullName}"></td>
+                <td>
+                    <button type="button"
+                            class="btn btn-sm btn-warning"
+                            data-bs-toggle="modal"
+                            th:data-bs-target="'#dischargeModal__' + ${patient.id}">
+                        Змінити виписку
+                    </button>
+                    <form th:action="@{/patients/delete}" method="post" style="display:inline;">
+                        <input type="hidden" name="patientId" th:value="${patient.id}" />
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
+                            Виписати
+                        </button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
