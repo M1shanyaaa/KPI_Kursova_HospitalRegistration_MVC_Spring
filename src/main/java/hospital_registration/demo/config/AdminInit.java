@@ -26,7 +26,7 @@ public class AdminInit {
 
             if (!personalRepo.existsByPosition("Головний лікар")) {
                 PersonalModel admin = new PersonalModel(
-                        "Рибак Михайло",
+                        "Рибак Михайло Класович",
                         adminLogin,
                         960741514,
                         "Головний лікар",

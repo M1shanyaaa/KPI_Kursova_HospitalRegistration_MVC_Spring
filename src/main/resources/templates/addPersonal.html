@@ -42,11 +42,11 @@
       <label class="form-label">Спеціалізація:</label>
       <select th:field="*{specialty}" class="form-select" required>
         <option value="" disabled selected>Оберіть положення</option>
+        <option value="Немає">Немає</option>
         <option value="Травматолог">Травматолог</option>
         <option value="Невролог">Невролог</option>
         <option value="Хірург">Хірург</option>
         <option value="Кардіолог">Кардіолог</option>
-        <option value="Немає">Немає</option>
       </select>
       <div class="text-danger" th:if="${#fields.hasErrors('specialty')}" th:errors="*{specialty}"></div>
     </div>

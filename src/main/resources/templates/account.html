@@ -17,7 +17,6 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
-
   </style>
 </head>
 <body>
@@ -46,9 +45,52 @@
         <th>Телефон</th>
         <td th:text="${user.phone}">Телефон</td>
       </tr>
+      <tr>
+        <th>Email</th>
+        <td th:text="${user.email}">Email</td>
+      </tr>
     </table>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">Редагувати</button>
   </div>
 </div>
 
+<!-- Модальне вікно -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form class="modal-content" th:action="@{/account/edit}" method="post">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Редагування акаунта</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" name="id" th:value="${user.id}">
+
+        <div class="mb-3">
+          <label for="fullName" class="form-label">Ім’я</label>
+          <input type="text" class="form-control" id="fullName" name="fullName" th:value="${user.fullName}" required>
+        </div>
+        <div class="mb-3">
+          <label for="login" class="form-label">Логін</label>
+          <input type="text" class="form-control" id="login" name="login" th:value="${user.login}" required>
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Телефон</label>
+          <input type="number" class="form-control" id="phone" name="phone" th:value="${user.phone}" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="email" th:value="${user.email}" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Зберегти</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

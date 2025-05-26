@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * Контролер для обробки перегляду акаунтів користувачів.
@@ -69,5 +71,35 @@ public class AccountController {
         model.addAttribute("user", user);
         model.addAttribute("isOwnAccount", isOwnAccount);
         return "account";
+    }
+
+    @PostMapping("/account/edit")
+    public String editAccount(@ModelAttribute PersonalModel updatedUser, HttpSession session) {
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/";
+        }
+
+        // Перевірка прав доступу (якщо потрібно)
+        if (!authService.hasMainDoctorAccess(loggedInUser) && !loggedInUser.getId().equals(updatedUser.getId())) {
+            return "redirect:/access-denied";
+        }
+
+        // Оновлюємо дані користувача
+        PersonalModel existingUser = personalRepo.findById(updatedUser.getId()).orElse(null);
+        if (existingUser != null) {
+            existingUser.setFullName(updatedUser.getFullName());
+            existingUser.setLogin(updatedUser.getLogin());
+            existingUser.setPhone(updatedUser.getPhone());
+            existingUser.setEmail(updatedUser.getEmail());
+            personalRepo.save(existingUser);
+
+            // Якщо користувач редагує власний акаунт - оновлюємо сесію
+            if (loggedInUser.getId().equals(updatedUser.getId())) {
+                session.setAttribute("loggedInUser", existingUser);
+            }
+        }
+
+        return "redirect:/account";
     }
 }
