@@ -47,18 +47,18 @@ public class MainController {
     /**
      * Processes the login request.
      *
-     * @param maindoctor the model object containing login information
+     * @param doctor the model object containing login information
      * @param model      the model to add attributes to
      * @param session    the HTTP session to store authenticated user
      * @return redirect to respective home page if successful, otherwise back to login with error
      */
     @PostMapping("/")
-    public String login(@ModelAttribute PersonalModel maindoctor, Model model, HttpSession session) {
-        Optional<PersonalModel> userOptional = personalRepo.findByLogin(maindoctor.getLogin());
+    public String login(@ModelAttribute PersonalModel doctor, Model model, HttpSession session) {
+        Optional<PersonalModel> userOptional = personalRepo.findByLogin(doctor.getLogin());
 
 
-        if ((userOptional.isPresent() && userOptional.get().getAccess_key().equals(maindoctor.getAccess_key())) ||
-        (userOptional.isPresent() && userOptional.get().getAccess_key().equals(passwordService.encodePassword(maindoctor.getAccess_key()))))  {
+        if ((userOptional.isPresent() && userOptional.get().getAccess_key().equals(doctor.getAccess_key())) ||
+                (userOptional.isPresent() && passwordService.matchesPassword(doctor.getAccess_key(), userOptional.get().getAccess_key()))){
             PersonalModel loggedInUser = userOptional.get();
             session.setAttribute("loggedInUser", loggedInUser);
 

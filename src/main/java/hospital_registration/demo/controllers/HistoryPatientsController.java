@@ -30,10 +30,10 @@ public class HistoryPatientsController {
     public String getHistory(Model model, HttpSession session,
                              @RequestParam(value = "search", required = false) String searchTerm,
                              @RequestParam(value = "searchType", required = false, defaultValue = "all") String searchType) {
-        PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
         if (session.getAttribute("loggedInUser") == null) {
             return "redirect:/";
         }
+        PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
         // Визначаємо чи є пошуковий запит
         boolean hasSearchTerm = searchTerm != null && !searchTerm.trim().isEmpty();
         String cleanSearchTerm = hasSearchTerm ? searchTerm.trim() : "";
@@ -66,6 +66,17 @@ public class HistoryPatientsController {
                     // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
                     return new ArrayList<>();
                 }
+            case "recordedDATE":
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return historyPatientRepo.findByRecordedDate(from, to);
+                } catch (DateTimeParseException e) {
+                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
+                    return new ArrayList<>();
+                }
             case "all":
             default:
                 try {
@@ -73,7 +84,7 @@ public class HistoryPatientsController {
                     LocalDate date = LocalDate.parse(searchTerm, formatter);
                     LocalDateTime from = date.atStartOfDay();
                     LocalDateTime to = date.atTime(LocalTime.MAX);
-                    return historyPatientRepo.findByDischargeDate(from, to);
+                    return historyPatientRepo.findByDateFields(from, to);
                 } catch (DateTimeParseException e) {
                     return historyPatientRepo.findByAllFieldsContaining(searchTerm);
                 }

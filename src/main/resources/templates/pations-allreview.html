@@ -39,56 +39,86 @@
 <header th:if="${user.position.equalsIgnoreCase('Головний лікар')}" th:insert="~{blocks/MainDoctorheader :: header}"></header>
 <header th:if="${user.position.equalsIgnoreCase('Лікар')}" th:insert="~{blocks/Doctorheader :: header}"></header>
 
-<div class="text-center mt-5">
-  <h1 class="mb-4">Інформація про записаних пацієнтів</h1>
-</div>
+<div class="container mt-4">
+  <div class="text-center">
+    <h1 class="mb-3">Перегляд пацієнтів</h1>
+    <p class="text-muted">Перегляд всіх зареєстрованих пацієнтів</p>
+  </div>
 
-<div class="container mt-3" th:if="${message}">
-  <div class="alert alert-success text-center" th:text="${message}"></div>
-</div>
+  <div class="row justify-content-center search-bar">
+    <div class="col-md-10">
+      <form method="get" th:action="@{/AllReview}">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <input type="text" class="form-control" name="search" id="search"
+                   th:value="${searchTerm}" placeholder="Введіть ім'я, телефон або діагноз...">
+          </div>
+          <div class="col-md-4">
+            <select class="form-select" name="searchType" id="searchType" th:value="${searchType}">
+              <option value="all" th:selected="${searchType == 'all'}">По всіх полях</option>
+              <option value="name" th:selected="${searchType == 'name'}">Ім'я</option>
+              <option value="phone" th:selected="${searchType == 'phone'}">Телефон</option>
+              <option value="diagnosis" th:selected="${searchType == 'diagnosis'}">Діагноз</option>
+              <option value="recordedDATE" th:selected="${searchType == 'recordedDATE'}">Дата запису</option>
+              <option value="dischargeDATE" th:selected="${searchType == 'dischargeDATE'}">Дата виписки</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex">
+            <button type="submit" class="btn btn-primary w-100 me-1">Знайти</button>
+            <a href="/AllReview" class="btn btn-secondary">Очистити</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
 
-<div class="table-container">
-  <table class="table table-bordered table-hover custom-table">
-    <thead>
-    <tr>
-      <th>#</th>
-      <th>Ім'я пацієнта</th>
-      <th>Телефон</th>
-      <th>Діагноз</th>
-      <th>Нотатки</th>
-      <th>Дата прийому</th>
-      <th>Дата виписки</th>
-      <th>Лікар</th>
-      <th>Дії</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="patient : ${patients}">
-      <td th:text="${patient.id}"></td>
-      <td th:text="${patient.fullName}"></td>
-      <td th:text="${patient.phone}"></td>
-      <td th:text="${patient.diagnosis}"></td>
-      <td th:text="${patient.notes}"></td>
-      <td th:text="${patient.appointmentDateFrom.format(formatter)}"></td>
-      <td th:text="${patient.appointmentDateTo.format(formatter)}"></td>
-      <td th:text="${patient.doctor.fullName}"></td>
-      <td>
-        <button type="button"
-                class="btn btn-sm btn-warning"
-                data-bs-toggle="modal"
-                th:data-bs-target="'#dischargeModal__' + ${patient.id}">
-          Змінити виписку
-        </button>
-        <form th:action="@{/patients/delete}" method="post" style="display:inline;">
-          <input type="hidden" name="patientId" th:value="${patient.id}" />
-          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
-            Виписати
+  <div class="alert alert-info text-center" th:if="${searchTerm != null and !searchTerm.isEmpty()}">
+    Результати пошуку для "<strong th:text="${searchTerm}"></strong>" (<span th:text="${totalPatients}">0</span> записів знайдено)
+  </div>
+
+  <div class="table-container">
+    <table class="table table-bordered table-hover custom-table">
+      <thead>
+      <tr>
+        <th>#</th>
+        <th>Ім'я пацієнта</th>
+        <th>Телефон</th>
+        <th>Діагноз</th>
+        <th>Нотатки</th>
+        <th>Дата прийому</th>
+        <th>Дата виписки</th>
+        <th>Лікар</th>
+        <th>Дії</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="patient : ${patients}">
+        <td th:text="${patient.id}"></td>
+        <td th:text="${patient.fullName}"></td>
+        <td th:text="${patient.phone}"></td>
+        <td th:text="${patient.diagnosis}"></td>
+        <td th:text="${patient.notes}"></td>
+        <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"></td>
+        <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"></td>
+        <td th:text="${patient.doctor.fullName}"></td>
+        <td>
+          <button type="button"
+                  class="btn btn-sm btn-warning"
+                  data-bs-toggle="modal"
+                  th:data-bs-target="'#dischargeModal__' + ${patient.id}">
+            Змінити виписку
           </button>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+          <form th:action="@{/patients/delete}" method="post" style="display:inline;">
+            <input type="hidden" name="patientId" th:value="${patient.id}" />
+            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
+              Виписати
+            </button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Модальні вікна -->
@@ -107,7 +137,7 @@
             <input type="datetime-local"
                    class="form-control"
                    name="dischargeDate"
-                   th:value="${patient.appointmentDateTo.format(formatter)}"
+                   th:value="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"
                    required />
           </div>
           <div class="modal-footer">

@@ -37,6 +37,7 @@
 <body>
 <header th:if="${user.position.equalsIgnoreCase('Головний лікар')}" th:insert="~{blocks/MainDoctorheader :: header}"></header>
 <header th:if="${user.position.equalsIgnoreCase('Лікар')}" th:insert="~{blocks/Doctorheader :: header}"></header>
+<header th:if="${user.position.equalsIgnoreCase('Медсестра/Медбрат')}" th:insert="~{blocks/Nurseheader :: header}"></header>
 
 <div class="container mt-4">
     <div class="text-center">
@@ -58,6 +59,7 @@
                             <option value="name" th:selected="${searchType == 'name'}">Ім'я</option>
                             <option value="phone" th:selected="${searchType == 'phone'}">Телефон</option>
                             <option value="diagnosis" th:selected="${searchType == 'diagnosis'}">Діагноз</option>
+                            <option value="recordedDATE" th:selected="${searchType == 'recordedDATE'}">Дата запису</option>
                             <option value="dischargeDATE" th:selected="${searchType == 'dischargeDATE'}">Дата виписки</option>
                         </select>
                     </div>

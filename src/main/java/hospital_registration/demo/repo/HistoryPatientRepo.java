@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,12 +36,19 @@ public interface HistoryPatientRepo extends JpaRepository<HistoryPatientsModel, 
     @Query("SELECT h FROM HistoryPatientsModel h WHERE h.appointmentDateTo BETWEEN :from AND :to")
     List<HistoryPatientsModel> findByDischargeDate(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 
+    @Query("SELECT h FROM HistoryPatientsModel h WHERE h.appointmentDateFrom BETWEEN :from AND :to")
+    List<HistoryPatientsModel> findByRecordedDate(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    @Query("SELECT h FROM HistoryPatientsModel h WHERE " +
+            "h.appointmentDateFrom BETWEEN :from AND :to OR " +
+            "h.appointmentDateTo BETWEEN :from AND :to")
+    List<HistoryPatientsModel> findByDateFields(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
     // Комбінований пошук за всіма полями
     @Query("SELECT h FROM HistoryPatientsModel h WHERE " +
             "LOWER(h.fullName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "h.phone LIKE CONCAT('%', :searchTerm, '%') OR " +
-            "LOWER(h.diagnosis) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "CAST(h.appointmentDateTo AS string) LIKE CONCAT('%', :searchTerm, '%')")
+            "LOWER(h.diagnosis) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<HistoryPatientsModel> findByAllFieldsContaining(@Param("searchTerm") String searchTerm);
 
     // Пошук за лікарем та ім'ям

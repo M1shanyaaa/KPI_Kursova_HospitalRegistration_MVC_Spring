@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,9 +36,9 @@ public class PatientReviewController {
     @Autowired
     private PatientRepo patientRepo;
     @Autowired
-    private HistoryPatientRepo historyPatientRepo;
-    @Autowired
     private AuthorizationService authService;
+    @Autowired
+    private HistoryPatientRepo historyPatientRepo;
 
 
     /**
@@ -48,27 +52,36 @@ public class PatientReviewController {
      * @return назва шаблону інформаційної панелі лікаря або редірект при відсутності доступу
      */
     @GetMapping("/DoctorHome/dashboard/{id}")
-    public String getDoctorDashboard(@PathVariable Long id, HttpSession session, Model model) {
-        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
+    public String getDoctorDashboard(@PathVariable Long id, HttpSession session,
+                                     @RequestParam(value = "search", required = false) String searchTerm,
+                                     @RequestParam(value = "searchType", required = false, defaultValue = "all") String searchType,Model model) {
+        PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
+        if (user == null) {
             return "redirect:/";
         }
         // Перевірка прав доступу
-        if (!authService.hasDoctorAccess(loggedInUser)) {
+        if (!authService.hasDoctorAccess(user)) {
             return "redirect:/access-denied";
         }
 
         // Додаткова перевірка: лікар може бачити тільки своїх пацієнтів
-        if (authService.isDoctor(loggedInUser) && !loggedInUser.getId().equals(id)) {
+        if (authService.isDoctor(user) && !user.getId().equals(id)) {
             return "redirect:/access-denied";
         }
+        // Визначаємо чи є пошуковий запит
+        boolean hasSearchTerm = searchTerm != null && !searchTerm.trim().isEmpty();
+        String cleanSearchTerm = hasSearchTerm ? searchTerm.trim() : "";
 
-        List<PatientModel> patients = patientRepo.findByDoctor_Id(id);
+        List<PatientModel> patients = getFilteredPatientsForDoctor(cleanSearchTerm, searchType, id);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
+        model.addAttribute("user", user);
         model.addAttribute("patients", patients);
-        model.addAttribute("formatter", formatter);
-        model.addAttribute("user", loggedInUser);
+        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("totalPatients", patients.size());
+        model.addAttribute("doctorId", id);
+
 
         return "pations-review-dashboard";
     }
@@ -211,24 +224,118 @@ public class PatientReviewController {
      */
 
     @GetMapping("/AllReview")
-    public String getAllPatientsForMainDoctor(HttpSession session, Model model) {
-        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
-        if (loggedInUser == null) {
+    public String getAllPatientsForMainDoctor(HttpSession session,
+                                              @RequestParam(value = "search", required = false) String searchTerm,
+                                              @RequestParam(value = "searchType", required = false, defaultValue = "all") String searchType,
+                                              Model model) {
+        PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
+        if (user == null) {
             return "redirect:/";
         }
         List<PatientModel> allPatients = patientRepo.findAll();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        if (authService.isDoctor(loggedInUser) || authService.isMainDoctor(loggedInUser) ) {
-            model.addAttribute("patients", allPatients);
-            model.addAttribute("formatter", formatter);
-            model.addAttribute("user", loggedInUser);
+        // Визначаємо чи є пошуковий запит
+        boolean hasSearchTerm = searchTerm != null && !searchTerm.trim().isEmpty();
+        String cleanSearchTerm = hasSearchTerm ? searchTerm.trim() : "";
+
+        List<PatientModel> patients = getFilteredPatients(cleanSearchTerm, searchType);
+        model.addAttribute("user", user);
+        model.addAttribute("patients", patients);
+        model.addAttribute("searchTerm", searchTerm);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("totalPatients", patients.size());
+        if (authService.isDoctor(user) || authService.isMainDoctor(user) ) {
             return "pations-allreview";
-        } else if (authService.isNurse(loggedInUser)) {
-            model.addAttribute("patients", allPatients);
-            model.addAttribute("formatter", formatter);
-            model.addAttribute("user", loggedInUser);
+        } else if (authService.isNurse(user)) {
             return "pations-allreview-nurse";
         }else{return "redirect:/error";}
 
+    }
+
+    private List<PatientModel> getFilteredPatientsForDoctor(String searchTerm, String searchType, Long id) {
+        switch (searchType) {
+            case "name":
+                return patientRepo.findByDoctorIdAndFullNameContainingIgnoreCase(id, searchTerm);
+            case "phone":
+                return patientRepo.findByDoctorIdAndPhoneContaining(id, searchTerm);
+            case "diagnosis":
+                return patientRepo.findByDoctorIdAndDiagnosisContainingIgnoreCase(id, searchTerm);
+            case "dischargeDATE":
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return patientRepo.findByAppointmentDateBetweenDoctorId(id, from, to);
+                } catch (DateTimeParseException e) {
+                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
+                    return new ArrayList<>();
+                }
+            case "recordedDATE":
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return patientRepo.findByRecordedDateDoctor(id, from, to);
+                } catch (DateTimeParseException e) {
+                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
+                    return new ArrayList<>();
+                }
+            case "all":
+            default:
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return patientRepo.findByDateFieldsDoctor(id, from, to);
+                } catch (DateTimeParseException e) {
+                    return patientRepo.findByDoctorIdAndAllFieldsContaining(id, searchTerm);
+                }
+        }
+    }
+
+    private List<PatientModel> getFilteredPatients(String searchTerm, String searchType) {
+        switch (searchType) {
+            case "name":
+                return patientRepo.findByFullNameContainingIgnoreCase(searchTerm);
+            case "phone":
+                return patientRepo.findByPhoneContaining(searchTerm);
+            case "diagnosis":
+                return patientRepo.findByDiagnosisContainingIgnoreCase(searchTerm);
+            case "dischargeDATE":
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return patientRepo.findByAppointmentDateBetween(from, to);
+                } catch (DateTimeParseException e) {
+                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
+                    return new ArrayList<>();
+                }
+            case "recordedDATE":
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return patientRepo.findByRecordedDate(from, to);
+                } catch (DateTimeParseException e) {
+                    // Якщо введено не дату — повернути порожній список або всі записи, або логувати помилку
+                    return new ArrayList<>();
+                }
+            case "all":
+            default:
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+                    LocalDate date = LocalDate.parse(searchTerm, formatter);
+                    LocalDateTime from = date.atStartOfDay();
+                    LocalDateTime to = date.atTime(LocalTime.MAX);
+                    return patientRepo.findByDateFields(from, to);
+                } catch (DateTimeParseException e) {
+                    return patientRepo.findByAllFieldsContaining(searchTerm);
+                }
+        }
     }
 }
