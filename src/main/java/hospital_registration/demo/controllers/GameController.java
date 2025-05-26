@@ -83,7 +83,7 @@ public class GameController {
         model.addAttribute("attemptsLeft", maxAttempts - attempts.size());
         model.addAttribute("gameStatus", gameStatus);
         model.addAttribute("word", gameStatus.equals("LOSE") ? currentWord : "");
-        return "hangman";
+        return "game";
     }
 
     /**

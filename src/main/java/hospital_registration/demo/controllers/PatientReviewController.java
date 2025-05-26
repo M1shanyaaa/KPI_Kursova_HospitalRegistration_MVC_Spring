@@ -251,6 +251,23 @@ public class PatientReviewController {
 
     }
 
+    /**
+     * Повертає відфільтрований список пацієнтів, прикріплених до певного лікаря,
+     * згідно з вказаним типом пошуку та пошуковим терміном.
+     *
+     * @param searchTerm термін для пошуку (ПІБ, телефон, діагноз або дата)
+     * @param searchType тип пошуку:
+     *                   <ul>
+     *                      <li><b>name</b> — пошук за повним ім’ям пацієнта</li>
+     *                      <li><b>phone</b> — пошук за номером телефону</li>
+     *                      <li><b>diagnosis</b> — пошук за діагнозом</li>
+     *                      <li><b>dischargeDATE</b> — пошук за датою виписки (формат dd.MM.yyyy)</li>
+     *                      <li><b>recordedDATE</b> — пошук за датою реєстрації (формат dd.MM.yyyy)</li>
+     *                      <li><b>all</b> або інше — універсальний пошук по всіх полях</li>
+     *                   </ul>
+     * @param id ідентифікатор лікаря
+     * @return список пацієнтів, які відповідають умовам фільтрації; якщо пошукова дата недійсна — повертається порожній список
+     */
     private List<PatientModel> getFilteredPatientsForDoctor(String searchTerm, String searchType, Long id) {
         switch (searchType) {
             case "name":
@@ -295,6 +312,23 @@ public class PatientReviewController {
         }
     }
 
+
+    /**
+     * Повертає відфільтрований список усіх пацієнтів у системі (незалежно від лікаря),
+     * згідно з вказаним типом пошуку та пошуковим терміном.
+     *
+     * @param searchTerm термін для пошуку (ПІБ, телефон, діагноз або дата)
+     * @param searchType тип пошуку:
+     *                   <ul>
+     *                      <li><b>name</b> — пошук за повним ім’ям пацієнта</li>
+     *                      <li><b>phone</b> — пошук за номером телефону</li>
+     *                      <li><b>diagnosis</b> — пошук за діагнозом</li>
+     *                      <li><b>dischargeDATE</b> — пошук за датою виписки (формат dd.MM.yyyy)</li>
+     *                      <li><b>recordedDATE</b> — пошук за датою реєстрації (формат dd.MM.yyyy)</li>
+     *                      <li><b>all</b> або інше — універсальний пошук по всіх полях</li>
+     *                   </ul>
+     * @return список пацієнтів, які відповідають умовам фільтрації; якщо пошукова дата недійсна — повертається порожній список
+     */
     private List<PatientModel> getFilteredPatients(String searchTerm, String searchType) {
         switch (searchType) {
             case "name":
