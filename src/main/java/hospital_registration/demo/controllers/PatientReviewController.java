@@ -83,7 +83,7 @@ public class PatientReviewController {
         model.addAttribute("doctorId", id);
 
 
-        return "pations-review-dashboard";
+        return "patients-review-dashboard";
     }
 
     /**
@@ -244,9 +244,9 @@ public class PatientReviewController {
         model.addAttribute("searchType", searchType);
         model.addAttribute("totalPatients", patients.size());
         if (authService.isDoctor(user) || authService.isMainDoctor(user) ) {
-            return "pations-allreview";
+            return "patients-allreview";
         } else if (authService.isNurse(user)) {
-            return "pations-allreview-nurse";
+            return "patients-allreview-nurse";
         }else{return "redirect:/error";}
 
     }
