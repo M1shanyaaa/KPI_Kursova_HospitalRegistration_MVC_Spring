@@ -3,6 +3,14 @@ package hospital_registration.demo.service;
 import hospital_registration.demo.Models.PersonalModel;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервіс авторизації, який визначає роль користувача
+ * та перевіряє доступ до різних частин системи.
+ * <p>
+ * Працює з об'єктами {@link PersonalModel}, де визначено посаду користувача.
+ * </p>
+ */
+
 @Service
 public class AuthorizationService {
 

@@ -11,6 +11,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * Контролер гри (5-буквена версія на кшталт Wordle).
+ * <p>
+ * Дозволяє користувачеві вгадувати слово, відображає підсвітку літер (зелений, жовтий, сірий),
+ * зберігає стан гри у {@link HttpSession}.
+ * </p>
+ */
 @Controller
 public class GameController {
 
@@ -18,10 +25,19 @@ public class GameController {
     private final int maxAttempts = 6;
     private final int wordLength = 5;
 
+    /**
+     * Конструктор. Завантажує список слів з файлу `word.txt` (тільки слова з 5 букв).
+     */
     public GameController() {
         words = loadWordsFromFile("word.txt");
     }
 
+    /**
+     * Завантажує слова з ресурсу класу (файл у classpath).
+     *
+     * @param filename ім’я файлу зі словами
+     * @return список слів довжиною {@code wordLength}
+     */
     private List<String> loadWordsFromFile(String filename) {
         List<String> list = new ArrayList<>();
         try {
@@ -31,7 +47,7 @@ public class GameController {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
-                    if (line.length() == wordLength) {  // беремо тільки слова з 5 букв
+                    if (line.length() == wordLength) {
                         list.add(line.toLowerCase());
                     }
                 }
@@ -42,6 +58,13 @@ public class GameController {
         return list;
     }
 
+    /**
+     * Відображає сторінку гри. Ініціалізує нову гру, якщо ще не почато.
+     *
+     * @param session сесія користувача
+     * @param model   модель для передачі атрибутів у шаблон
+     * @return ім’я шаблону гри ("hangman")
+     */
     @GetMapping("/hangman")
     public String showGame(HttpSession session, Model model) {
         if (session.getAttribute("currentWord") == null) {
@@ -63,6 +86,13 @@ public class GameController {
         return "hangman";
     }
 
+    /**
+     * Обробляє здогад користувача, додає його до спроб, змінює статус гри.
+     *
+     * @param guess   слово, введене користувачем
+     * @param session сесія користувача
+     * @return редірект на сторінку гри
+     */
     @PostMapping("/hangman/guessWord")
     public String guessWord(@RequestParam String guess, HttpSession session) {
         String currentWord = (String) session.getAttribute("currentWord");
@@ -87,12 +117,23 @@ public class GameController {
         return "redirect:/hangman";
     }
 
+    /**
+     * Скидає поточну гру, починаючи нову.
+     *
+     * @param session сесія користувача
+     * @return редірект на сторінку гри
+     */
     @PostMapping("/hangman/reset")
     public String resetGame(HttpSession session) {
         startNewGame(session);
         return "redirect:/hangman";
     }
 
+    /**
+     * Ініціалізує нову гру: вибирає випадкове слово, скидає спроби і статус гри.
+     *
+     * @param session сесія користувача
+     */
     private void startNewGame(HttpSession session) {
         Random random = new Random();
         String word;
@@ -105,11 +146,29 @@ public class GameController {
         session.setAttribute("gameStatus", "PLAY");
     }
 
+    /**
+     * Перевіряє, чи гра завершена (виграна або програна).
+     *
+     * @param session сесія користувача
+     * @return {@code true}, якщо гра завершена
+     */
     private boolean isGameOver(HttpSession session) {
         String status = (String) session.getAttribute("gameStatus");
         return status != null && (status.equals("WIN") || status.equals("LOSE"));
     }
 
+    /**
+     * Генерує підсвітку букв (зелене, жовте, сіре) для кожної спроби.
+     * <ul>
+     *     <li>зелений — правильна літера на правильному місці</li>
+     *     <li>жовтий — літера є, але не на своєму місці</li>
+     *     <li>сірий — літера відсутня</li>
+     * </ul>
+     *
+     * @param attempts   список попередніх спроб
+     * @param targetWord правильне слово
+     * @return список списків (по літерах) з мапою {@code letter → color}
+     */
     private List<List<Map<String, String>>> buildColorFeedback(List<String> attempts, String targetWord) {
         List<List<Map<String, String>>> result = new ArrayList<>();
 
@@ -117,7 +176,7 @@ public class GameController {
             List<Map<String, String>> feedback = new ArrayList<>();
             boolean[] usedInTarget = new boolean[targetWord.length()];
 
-            // GREEN pass
+            // Зелений прохід (точні збіги)
             for (int i = 0; i < attempt.length(); i++) {
                 Map<String, String> letterInfo = new HashMap<>();
                 char ch = attempt.charAt(i);
@@ -132,7 +191,7 @@ public class GameController {
                 feedback.add(letterInfo);
             }
 
-            // YELLOW pass
+            // Жовтий прохід (літери на інших позиціях)
             for (int i = 0; i < attempt.length(); i++) {
                 char ch = attempt.charAt(i);
                 if (feedback.get(i).get("color").equals("gray")) {
