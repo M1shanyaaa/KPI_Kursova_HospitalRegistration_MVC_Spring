@@ -1,0 +1,258 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Редагування пацієнта</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      background-color: #f4f8fb;
+    }
+
+    .form-container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin: 40px auto;
+      max-width: 800px;
+    }
+
+    h1 {
+      color: #0d6efd;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .btn-primary {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+    }
+
+    .btn-primary:hover {
+      background-color: #0a58ca;
+      border-color: #0a58ca;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .alert-success {
+      border-color: #198754;
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .is-invalid {
+      border-color: #dc3545;
+    }
+
+    .invalid-feedback {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+<header th:if="${user.position.equalsIgnoreCase('Головний лікар')}" th:insert="~{blocks/MainDoctorheader :: header}"></header>
+<header th:if="${user.position.equalsIgnoreCase('Лікар')}" th:insert="~{blocks/Doctorheader :: header}"></header>
+
+<div class="container">
+  <div class="form-container">
+    <h1>Редагування даних пацієнта</h1>
+
+    <!-- Повідомлення про успіх -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <span th:text="${successMessage}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <form th:action="@{/patients/edit/{id}(id=${patientId})}" th:object="${patient}" method="post">
+      <div class="row">
+        <!-- Повне ім'я -->
+        <div class="col-md-6 mb-3">
+          <label for="fullName" class="form-label">Повне ім'я <span class="text-danger">*</span></label>
+          <input type="text"
+                 th:field="*{fullName}"
+                 th:class="${#fields.hasErrors('fullName')} ? 'form-control is-invalid' : 'form-control'"
+                 id="fullName"
+                 placeholder="Введіть повне ім'я пацієнта">
+          <div th:if="${#fields.hasErrors('fullName')}" class="invalid-feedback">
+            <span th:errors="*{fullName}"></span>
+          </div>
+        </div>
+
+        <!-- Телефон -->
+        <div class="col-md-6 mb-3">
+          <label for="phone" class="form-label">Номер телефону <span class="text-danger">*</span></label>
+          <input type="text"
+                 th:field="*{phone}"
+                 th:class="${#fields.hasErrors('phone')} ? 'form-control is-invalid' : 'form-control'"
+                 id="phone"
+                 placeholder="+380123456789">
+          <div th:if="${#fields.hasErrors('phone')}" class="invalid-feedback">
+            <span th:errors="*{phone}"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Діагноз -->
+        <div class="col-md-6 mb-3">
+          <label for="diagnosis" class="form-label">Діагноз <span class="text-danger">*</span></label>
+          <input type="text"
+                 th:field="*{diagnosis}"
+                 th:class="${#fields.hasErrors('diagnosis')} ? 'form-control is-invalid' : 'form-control'"
+                 id="diagnosis"
+                 placeholder="Введіть діагноз">
+          <div th:if="${#fields.hasErrors('diagnosis')}" class="invalid-feedback">
+            <span th:errors="*{diagnosis}"></span>
+          </div>
+        </div>
+
+        <!-- Дата народження -->
+        <div class="col-md-6 mb-3">
+          <label for="birthDate" class="form-label">Дата народження <span class="text-danger">*</span></label>
+          <input type="date"
+                 th:field="*{birthDate}"
+                 th:class="${#fields.hasErrors('birthDate')} ? 'form-control is-invalid' : 'form-control'"
+                 id="birthDate">
+          <div th:if="${#fields.hasErrors('birthDate')}" class="invalid-feedback">
+            <span th:errors="*{birthDate}"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Департамент -->
+        <div class="col-md-6 mb-3">
+          <label for="department" class="form-label">Департамент <span class="text-danger">*</span></label>
+          <select th:field="*{department}"
+                  th:class="${#fields.hasErrors('department')} ? 'form-select is-invalid' : 'form-select'"
+                  id="department">
+            <option value="">Оберіть департамент</option>
+            <option value="Кардіологія">Кардіологія</option>
+            <option value="Неврологія">Неврологія</option>
+            <option value="Хірургія">Хірургія</option>
+            <option value="Педіатрія">Педіатрія</option>
+            <option value="Онкологія">Онкологія</option>
+            <option value="Терапія">Терапія</option>
+            <option value="Офтальмологія">Офтальмологія</option>
+            <option value="Гінекологія">Гінекологія</option>
+          </select>
+          <div th:if="${#fields.hasErrors('department')}" class="invalid-feedback">
+            <span th:errors="*{department}"></span>
+          </div>
+        </div>
+
+        <!-- Лікар -->
+        <div class="col-md-6 mb-3">
+          <label for="doctor" class="form-label">Лікар <span class="text-danger">*</span></label>
+          <select th:field="*{doctor.id}"
+                  th:class="${#fields.hasErrors('doctor')} ? 'form-select is-invalid' : 'form-select'"
+                  id="doctor">
+            <option value="">Оберіть лікаря</option>
+            <option th:each="doctor : ${doctors}"
+                    th:value="${doctor.id}"
+                    th:text="${doctor.fullName + ' (' + doctor.specialty + ')'}"
+                    th:selected="${doctor.id == patient.doctor.id}">
+            </option>
+          </select>
+          <div th:if="${#fields.hasErrors('doctor')}" class="invalid-feedback">
+            <span th:errors="*{doctor}"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Палата -->
+        <div class="col-md-4 mb-3">
+          <label for="ward" class="form-label">Номер палати <span class="text-danger">*</span></label>
+          <input type="number"
+                 th:field="*{ward}"
+                 th:class="${#fields.hasErrors('ward')} ? 'form-control is-invalid' : 'form-control'"
+                 id="ward"
+                 min="1"
+                 placeholder="101">
+          <div th:if="${#fields.hasErrors('ward')}" class="invalid-feedback">
+            <span th:errors="*{ward}"></span>
+          </div>
+        </div>
+
+        <!-- Ліжко -->
+        <div class="col-md-4 mb-3">
+          <label for="bed" class="form-label">Номер ліжка <span class="text-danger">*</span></label>
+          <input type="number"
+                 th:field="*{bed}"
+                 th:class="${#fields.hasErrors('bed')} ? 'form-control is-invalid' : 'form-control'"
+                 id="bed"
+                 min="1"
+                 placeholder="1">
+          <div th:if="${#fields.hasErrors('bed')}" class="invalid-feedback">
+            <span th:errors="*{bed}"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <!-- Дата прийому -->
+        <div class="col-md-6 mb-3">
+          <label for="appointmentDateFrom" class="form-label">Дата прийому <span class="text-danger">*</span></label>
+          <input type="datetime-local"
+                 th:field="*{appointmentDateFrom}"
+                 th:class="${#fields.hasErrors('appointmentDateFrom')} ? 'form-control is-invalid' : 'form-control'"
+                 id="appointmentDateFrom">
+          <div th:if="${#fields.hasErrors('appointmentDateFrom')}" class="invalid-feedback">
+            <span th:errors="*{appointmentDateFrom}"></span>
+          </div>
+        </div>
+
+        <!-- Дата виписки -->
+        <div class="col-md-6 mb-3">
+          <label for="appointmentDateTo" class="form-label">Дата виписки <span class="text-danger">*</span></label>
+          <input type="datetime-local"
+                 th:field="*{appointmentDateTo}"
+                 th:class="${#fields.hasErrors('appointmentDateTo')} ? 'form-control is-invalid' : 'form-control'"
+                 id="appointmentDateTo">
+          <div th:if="${#fields.hasErrors('appointmentDateTo')}" class="invalid-feedback">
+            <span th:errors="*{appointmentDateTo}"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Нотатки -->
+      <div class="mb-4">
+        <label for="notes" class="form-label">Додаткові нотатки</label>
+        <textarea th:field="*{notes}"
+                  th:class="${#fields.hasErrors('notes')} ? 'form-control is-invalid' : 'form-control'"
+                  id="notes"
+                  rows="4"
+                  placeholder="Додаткова інформація про пацієнта..."></textarea>
+        <div th:if="${#fields.hasErrors('notes')}" class="invalid-feedback">
+          <span th:errors="*{notes}"></span>
+        </div>
+      </div>
+
+      <!-- Кнопки -->
+      <div class="d-flex justify-content-between">
+        <a th:if="${user.position.equalsIgnoreCase('Головний лікар')}"
+           href="/AllReview"
+           class="btn btn-secondary">
+          Повернутися до списку
+        </a>
+        <a th:if="${user.position.equalsIgnoreCase('Лікар')}"
+           th:href="@{/DoctorHome/dashboard/{id}(id=${user.id})}"
+           class="btn btn-secondary">
+          Повернутися до моїх пацієнтів
+        </a>
+        <button type="submit" class="btn btn-primary">Оновити дані пацієнта</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer th:insert="~{blocks/footer :: footer}"></footer>
+</body>
+</html>

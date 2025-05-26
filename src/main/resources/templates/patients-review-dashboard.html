@@ -99,18 +99,24 @@
                 <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"></td>
                 <td>
-                    <button type="button"
-                            class="btn btn-sm btn-warning"
-                            data-bs-toggle="modal"
-                            th:data-bs-target="'#dischargeModal__' + ${patient.id}">
-                        Змінити виписку
-                    </button>
-                    <form th:action="@{/patients/delete}" method="post" style="display:inline;">
-                        <input type="hidden" name="patientId" th:value="${patient.id}" />
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
-                            Виписати
+                    <div class="btn-group-vertical mb-1" role="group">
+                            <a th:href="@{/patients/edit/{id}(id=${patient.id})}"
+                               class="btn btn-sm btn-primary">
+                                Редагувати
+                            </a>
+                        <button type="button"
+                                class="btn btn-sm btn-warning mt-1"
+                                data-bs-toggle="modal"
+                                th:data-bs-target="'#dischargeModal__' + ${patient.id}">
+                            Змінити виписку
                         </button>
-                    </form>
+                        <form th:action="@{/patients/delete}" method="post" style="display:inline;">
+                            <input type="hidden" name="patientId" th:value="${patient.id}" />
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
+                                Виписати
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             </tbody>
