@@ -1,28 +1,406 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
+/* ============= ЗАГАЛЬНІ СТИЛІ ============= */
+html, body {
+    height: 100%;
     margin: 0;
     padding: 0;
 }
 
-header {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    padding: 1rem 0;
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f8fb;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 main {
-    padding: 2rem;
+    flex: 1;
+    padding-bottom: 2rem;
     text-align: center;
 }
 
+h1 {
+    color: #0d6efd;
+    margin-top: 30px;
+}
+
+/* ============= ХЕДЕР ТА НАВІГАЦІЯ ============= */
+header {
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.header-bar {
+    background-color: #0d6efd;
+    color: white;
+    border-bottom: 3px solid #084298;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 0;
+}
+
+.header-bar .nav-link {
+    color: white !important;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-top: 0;
+}
+
+.header-bar .nav-link:hover {
+    text-decoration: underline;
+    color: #dbe9ff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-top: 0;
+}
+
+.header-bar .fw-bold {
+    color: white;
+}
+
+.nav-link {
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+/* ============= ФУТЕР ============= */
 footer {
-    background-color: #333;
     color: white;
     text-align: center;
     padding: 0.5rem 0;
     position: fixed;
     width: 100%;
     bottom: 0;
+    margin-top: auto;
+}
+
+/* ============= КОМПОНЕНТИ ============= */
+
+/* Картки оголошень */
+.announcement-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.announcement-title {
+    color: #0d6efd;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.announcement-date {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Контейнери */
+.container-narrow {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ============= ТАБЛИЦІ ============= */
+.custom-table th {
+    background-color: #0d6efd;
+    color: white;
+    text-align: center;
+}
+
+.custom-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table-container {
+    margin: 40px auto;
+    width: 100%;
+    max-width: 1500px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+    display: block;
+}
+
+/* ============= ФОРМИ ============= */
+.search-bar {
+    margin-bottom: 30px;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-section {
+    margin-bottom: 25px;
+}
+
+.form-section h3 {
+    color: #0d6efd;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+/* ============= КНОПКИ ============= */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-outline-purple {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-outline-purple:hover,
+.btn-outline-purple:focus {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* ============= СТОРІНКА ВХОДУ ============= */
+/* Основний стиль для body сторінки входу */
+.login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #6b73ff, #000dff);
+    margin: 0;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Альтернативний контейнер для входу */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0d6efd, #000dff);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Картка входу */
+.login-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Обгортка форми входу */
+.wrapper {
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Заголовок */
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Рядки форми */
+.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Іконки в полях вводу */
+.row i {
+    position: absolute;
+    left: 10px;
+    color: #666;
+    z-index: 1;
+}
+
+/* Поля вводу */
+.row input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f9f9f9;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+/* Фокус на полях вводу */
+.row input:focus {
+    border-color: #0d6efd;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+/* Кнопка входу */
+.button input {
+    background: #0d6efd;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    padding: 10px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+/* Hover ефект для кнопки */
+.button input:hover {
+    background: #0b5ed7;
+}
+
+/* Посилання для реєстрації */
+.signup-link {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+}
+
+/* Стилі посилань */
+.signup-link a {
+    color: #0d6efd;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+    color: #0b5ed7;
+}
+
+/* ============= ПАНЕЛЬ АДМІНІСТРАТОРА ============= */
+.admin-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: transform 0.2s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Статистика */
+.stats-card {
+    background: linear-gradient(135deg, #0d6efd 0%, #084298 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+/* ============= РЕСПОНСИВНІСТЬ ============= */
+@media (max-width: 768px) {
+    .container-narrow {
+        padding: 0 15px;
+    }
+
+    .form-container {
+        margin: 15px;
+        padding: 20px;
+    }
+
+    .table-container {
+        margin: 20px 0;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .admin-card {
+        margin-bottom: 15px;
+        padding: 20px;
+    }
+
+    .stats-number {
+        font-size: 2rem;
+    }
+}
+
+/* ============= УТИЛІТИ ============= */
+.text-truncate-custom {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.shadow-custom {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.border-radius-custom {
+    border-radius: 15px;
+}
+
+/* ============= АНІМАЦІЇ ============= */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.card-body {
+    text-align: left !important;
 }

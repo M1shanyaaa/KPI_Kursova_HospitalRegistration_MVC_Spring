@@ -45,7 +45,6 @@ public class PatientValidationService {
                     patient.getAppointmentDateFrom(), patient.getAppointmentDateTo()
             );
 
-            // Редагування
             if (patient.getId() != null) {
                 conflicts = conflicts.stream()
                         .filter(p -> !p.getId().equals(patient.getId()))

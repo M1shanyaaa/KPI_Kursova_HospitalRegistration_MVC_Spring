@@ -29,11 +29,11 @@
     </style>
 </head>
 <body>
-<div class="container">
+<div class="container mt-5 error-container">
     <div class="error-container">
         <div class="error-icon">⚠️</div>
         <h1 class="mb-4">Доступ заборонено</h1>
-        <p class="lead mb-4">Нажаль, у вас немає доступу до запитаної сторінки.</p>
+        <p class="lead mb-4">На жаль, у вас немає доступу до запитаної сторінки.</p>
         <p>Ваша роль: <strong th:text="${user.position}">Роль</strong></p>
         <div class="back-link">
             <a th:if="${user.position == 'Головний лікар'}" href="/MainDoctorHome" class="btn btn-primary">Повернутися на головну</a>

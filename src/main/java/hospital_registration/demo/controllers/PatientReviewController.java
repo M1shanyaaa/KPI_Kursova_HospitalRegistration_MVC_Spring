@@ -243,11 +243,14 @@ public class PatientReviewController {
         model.addAttribute("searchTerm", searchTerm);
         model.addAttribute("searchType", searchType);
         model.addAttribute("totalPatients", patients.size());
-        if (authService.isDoctor(user) || authService.isMainDoctor(user) ) {
+        if (authService.isDoctor(user) || authService.isNurse(user)) {
             return "patients-allreview";
-        } else if (authService.isNurse(user)) {
-            return "patients-allreview-nurse";
-        }else{return "redirect:/error";}
+        } else if (authService.isMainDoctor(user)) {
+            return "patients-allreview-maindoctor";
+        } else {
+            return "redirect:/error";
+        }
+
 
     }
 

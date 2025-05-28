@@ -1,0 +1,448 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Керування персоналом</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f8fb;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Мінімальна висота 100% viewport */
+        }
+
+        main {
+            flex: 1; /* Займає весь доступний простір */
+            padding-bottom: 2rem; /* Відступ перед футером */
+        }
+
+        footer {
+            margin-top: auto; /* Автоматично штовхає футер до низу */
+        }
+
+
+        h1 {
+            color: #0d6efd;
+        }
+
+        .custom-table th {
+            background-color: #0d6efd;
+            color: white;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .custom-table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table-container {
+            margin: 40px auto;
+            max-width: 1200px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-outline-danger:hover,
+        .btn-outline-danger:focus {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .search-bar {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .badge {
+            font-size: 0.75em;
+        }
+
+        .position-badge {
+            padding: 0.4em 0.6em;
+            border-radius: 50px;
+        }
+
+        .position-doctor {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .position-nurse {
+            background-color: #198754;
+            color: white;
+        }
+
+        .position-main-doctor {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .text-truncate {
+            max-width: 150px;
+        }
+
+        .btn-group-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-group-actions .btn {
+            flex: 1;
+            min-width: 80px;
+        }
+    </style>
+</head>
+<body>
+<header th:insert="~{blocks/MainDoctorheader :: header}"></header>
+
+<div class="container mt-4">
+    <div class="text-center">
+        <h1 class="mb-3">Керування персоналом</h1>
+        <p class="text-muted">Перегляд та керування співробітниками лікарні</p>
+    </div>
+
+    <!-- Повідомлення про успіх/помилку -->
+    <div class="alert alert-success alert-dismissible fade show" th:if="${message}" role="alert">
+        <strong>Успіх!</strong> <span th:text="${message}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <div class="alert alert-danger alert-dismissible fade show" th:if="${error}" role="alert">
+        <strong>Помилка!</strong> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
+    <!-- Панель пошуку -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="search-bar">
+                <form method="get" th:action="@{/editPersinal}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="search" id="search"
+                                   th:value="${searchTerm}" placeholder="Введіть ім'я, логін, посаду або email...">
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" name="searchType" id="searchType">
+                                <option value="all" th:selected="${searchType == 'all'}">По всіх полях</option>
+                                <option value="name" th:selected="${searchType == 'name'}">Ім'я</option>
+                                <option value="login" th:selected="${searchType == 'login'}">Логін</option>
+                                <option value="position" th:selected="${searchType == 'position'}">Посада</option>
+                                <option value="specialty" th:selected="${searchType == 'specialty'}">Спеціалізація</option>
+                                <option value="email" th:selected="${searchType == 'email'}">Email</option>
+                                <option value="phone" th:selected="${searchType == 'phone'}">Телефон</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex">
+                            <button type="submit" class="btn btn-primary w-100 me-1">Знайти</button>
+                            <a href="/editPersinal" class="btn btn-secondary">Очистити</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Інформація про результати пошуку -->
+    <div class="alert alert-info text-center" th:if="${searchTerm != null and !searchTerm.isEmpty()}">
+        Результати пошуку для "<strong th:text="${searchTerm}"></strong>"
+        (<span th:text="${totalPersonal}">0</span> співробітників знайдено)
+    </div>
+
+    <!-- Таблиця персоналу -->
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Список персоналу</h5>
+            <span class="badge bg-primary fs-6" th:text="'Cпівробітники: ' + ${totalPersonal}"></span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover custom-table">
+                <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 18%;">Ім'я</th>
+                    <th style="width: 12%;">Логін</th>
+                    <th style="width: 13%;">Посада</th>
+                    <th style="width: 13%;">Спеціалізація</th>
+                    <th style="width: 11%;">Телефон</th>
+                    <th style="width: 14%;">Email</th>
+                    <th style="width: 15%;">Дії</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="personal, iterStat : ${personalList}">
+                    <td th:text="${iterStat.count}"></td>
+                    <td>
+                        <div class="text-start">
+                            <strong th:text="${personal.fullName}"></strong>
+                        </div>
+                    </td>
+                    <td>
+                        <code th:text="${personal.login}"></code>
+                    </td>
+                    <td>
+                        <span class="position-badge"
+                              th:class="${personal.position.toLowerCase().contains('головний') ? 'position-badge position-main-doctor' :
+                                         personal.position.toLowerCase().contains('лікар') ? 'position-badge position-doctor' :
+                                         'position-badge position-nurse'}"
+                              th:text="${personal.position}"></span>
+                    </td>
+                    <td>
+                        <span class="text-muted" th:text="${personal.specialty}"></span>
+                    </td>
+                    <td>
+                        <span th:text="${personal.phone}"></span>
+                    </td>
+                    <td>
+                        <div class="text-truncate" th:title="${personal.email}">
+                            <small th:text="${personal.email}"></small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <button type="button"
+                                    class="btn btn-outline-primary btn-sm mb-2"
+                                    data-bs-toggle="modal"
+                                    th:data-bs-target="'#editPersonalModal_' + ${personal.id}">
+                                <i class="bi bi-pencil"></i> Редагувати
+                            </button>
+                            <form th:action="@{/personal/delete}" method="post">
+                                <input type="hidden" name="personalId" th:value="${personal.id}" />
+                                <button type="submit"
+                                        class="btn btn-outline-danger btn-sm delete-btn"
+                                        th:data-name="${personal.fullName}">
+                                    <i class="bi bi-trash"></i> Видалити
+                                </button>
+                            </form>
+                        </div>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Модальні вікна для редагування персоналу -->
+        <div th:each="personal : ${personalList}">
+            <div th:id="'editPersonalModal_' + ${personal.id}" class="modal fade" tabindex="-1" aria-labelledby="editPersonalModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form th:action="@{/personal/update}" method="post">
+                            <input type="hidden" name="id" th:value="${personal.id}" />
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editPersonalModalLabel">
+                                    <i class="bi bi-person-gear"></i> Редагування співробітника
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="fullName" class="form-label">
+                                            <i class="bi bi-person"></i> Повне ім'я <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" name="fullName" id="fullName"
+                                               th:value="${personal.fullName}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="login" class="form-label">
+                                            <i class="bi bi-key"></i> Логін <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" name="login" id="login"
+                                               th:value="${personal.login}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="position" class="form-label">
+                                            <i class="bi bi-briefcase"></i> Посада <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" name="position" id="position" required>
+                                            <option value="Головний лікар" th:selected="${personal.position == 'Головний лікар'}">Головний лікар</option>
+                                            <option value="Лікар" th:selected="${personal.position == 'Лікар'}">Лікар</option>
+                                            <option value="Медсестра/Медбрат" th:selected="${personal.position == 'Медсестра/Медбрат'}">Медсестра/Медбрат</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="specialty" class="form-label">
+                                            <i class="bi bi-heart-pulse"></i> Спеціалізація <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" name="specialty" id="specialty"
+                                               th:value="${personal.specialty}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">
+                                            <i class="bi bi-telephone"></i> Телефон <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="tel" class="form-control" name="phone" id="phone"
+                                               th:value="${personal.phone != null && !personal.phone.toString().startsWith('0') ? '0' + personal.phone : personal.phone}"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">
+                                            <i class="bi bi-envelope"></i> Email <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" class="form-control" name="email" id="email"
+                                               th:value="${personal.email}" required>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label for="password" class="form-label">
+                                            <i class="bi bi-lock"></i> Новий пароль (необов'язково)
+                                        </label>
+                                        <input type="password" class="form-control" name="password" id="password"
+                                               placeholder="Введіть новий пароль або залиште порожнім">
+                                        <div class="form-text">
+                                            Залиште це поле порожнім, якщо не хочете змінювати пароль
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle"></i> Скасувати
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-circle"></i> Зберегти зміни
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Повідомлення, якщо немає результатів -->
+        <div class="text-center py-4" th:if="${personalList.isEmpty()}">
+            <div class="text-muted">
+                <i class="bi bi-person-x fs-1"></i>
+                <h5 class="mt-3">Не знайдено співробітників</h5>
+                <p th:if="${searchTerm != null and !searchTerm.isEmpty()}">
+                    Спробуйте змінити критерії пошуку або <a href="/editPersinal">переглянути всіх співrobітників</a>
+                </p>
+                <p th:if="${searchTerm == null or searchTerm.isEmpty()}">
+                    Наразі в системі немає зареєстрованих співробітників
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Додаткова інформація -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle"></i> Інформація про систему
+                    </h6>
+                    <p class="card-text text-muted">
+                        <small>
+                            • Ви можете редагувати та видаляти співробітників<br>
+                            • Ви не можите видаляти лікаря, якщо у нього є записані пацієнти<br>
+                            • Видалення співробітника є незворотною дією<br>
+                            • Для додавання нових співробітників використовуйте розділ "Додавання персоналу"<br>
+                            • При редагуванні залиште поле пароля порожнім, якщо не хочете його змінювати<br>
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:insert="~{blocks/footer :: footer}"></footer>
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
+<!-- JavaScript для підтвердження видалення -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Додаємо обробник для всіх кнопок видалення
+        document.querySelectorAll('.delete-btn').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const employeeName = this.getAttribute('data-name');
+                const confirmMessage = `Ви впевнені, що хочете видалити співробітника ${employeeName}? Ця дія незворотна!`;
+
+                if (confirm(confirmMessage)) {
+                    // Якщо користувач підтвердив, відправляємо форму
+                    this.closest('form').submit();
+                }
+            });
+        });
+
+        // Валідація форми редагування
+        document.querySelectorAll('form[action="/personal/update"]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                const fullName = this.querySelector('input[name="fullName"]').value.trim();
+                const login = this.querySelector('input[name="login"]').value.trim();
+                const email = this.querySelector('input[name="email"]').value.trim();
+                const phone = this.querySelector('input[name="phone"]').value.trim();
+
+                if (!fullName || !login || !email || !phone) {
+                    e.preventDefault();
+                    alert('Будь ласка, заповніть всі обов\'язкові поля!');
+                    return false;
+                }
+
+                // Перевірка формату email
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    alert('Будь ласка, введіть коректний email!');
+                    return false;
+                }
+
+                // Перевірка формату телефону (базова)
+                const phoneRegex = /^\d{10,15}$/;
+                if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
+                    e.preventDefault();
+                    alert('Будь ласка, введіть коректний номер телефону!');
+                    return false;
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
