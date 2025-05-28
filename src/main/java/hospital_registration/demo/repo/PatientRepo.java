@@ -191,4 +191,10 @@ public interface PatientRepo extends JpaRepository<PatientModel, Long> {
             "LOWER(p.diagnosis) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
     List<PatientModel> findByDoctorIdAndAllFieldsContaining(
             @Param("doctorId") Long doctorId, @Param("searchTerm") String searchTerm);
+
+    @Query("SELECT p FROM PatientModel p WHERE " +
+            "p.ward = :ward AND p.bed = :bed AND " +
+            "p.appointmentDateTo > :from AND p.appointmentDateFrom < :to")
+    List<PatientModel> findConflictingPatients(Integer ward, Integer bed, LocalDateTime from, LocalDateTime to);
+
 }

@@ -27,16 +27,19 @@
         <div class="mb-3">
             <label class="form-label">Ім'я:</label>
             <input type="text" th:field="*{fullName}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Дата народження:</label>
             <input type="date" th:field="*{birthDate}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Номер телефону:</label>
             <input type="tel" th:field="*{phone}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
@@ -59,11 +62,13 @@
         <div class="mb-3">
             <label class="form-label">Палата:</label>
             <input type="number" th:field="*{ward}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('ward')}" th:errors="*{ward}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Ліжко:</label>
             <input type="number" th:field="*{bed}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('bed')}" th:errors="*{bed}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
@@ -76,11 +81,13 @@
                         th:text="${doctor.fullName + ' (' + doctor.specialty + ')'}">
                 </option>
             </select>
+            <div th:if="${#fields.hasErrors('doctor')}" th:errors="*{doctor}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Дата запису пацієнта:</label>
             <input type="datetime-local" th:field="*{appointmentDateFrom}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('appointmentDateFrom')}" th:errors="*{appointmentDateFrom}" class="text-danger"></div>
         </div>
 
         <div class="mb-3">
@@ -91,7 +98,10 @@
         <div class="mb-5">
             <label class="form-label">Нотатки:</label>
             <textarea th:field="*{notes}" class="form-control" rows="3"></textarea>
+            <div th:if="${#fields.hasErrors('notes')}" class="text-danger">
+            </div>
         </div>
+
 
         <div class="text-end mb-5">
             <button type="submit" class="btn btn-primary btn-lg">Додати пацієнта</button>

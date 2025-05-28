@@ -1,10 +1,8 @@
 package hospital_registration.demo.Models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -23,16 +21,17 @@ public class PatientModel {
 
     /** Повне ім’я пацієнта. Обов’язкове поле. */
     @NotBlank(message = "Ім'я не може бути порожнім")
+    @Pattern(regexp = ".*[a-zA-Zа-яА-ЯіІїЇєЄґҐ].*", message = "Ім'я має містити хоча б одну букву")
     private String fullName;
 
-    /** Номер телефону пацієнта. Повинен відповідати формату +380xxxxxxxxx. */
+    /** Номер телефону пацієнта. Повинен відповідати формату 0xxxxxxxxx. */
     @NotBlank(message = "Номер телефону не може бути порожнім")
-    @Pattern(regexp = "\\+?\\d{10,15}", message = "Некоректний формат телефону")
+    @Pattern(regexp = "0\\d{9}", message = "Телефон має бути у форматі 0xxxxxxxxx")
     private String phone;
 
     /** Діагноз пацієнта. Обмеження: до 255 символів. */
     @NotBlank(message = "Діагноз не може бути порожнім")
-    @Size(max = 255, message = "Діагноз не може перевищувати 255 символів")
+    @Size(max = 100, message = "Діагноз не може перевищувати 100 символів")
     private String diagnosis;
 
     /** Дата народження пацієнта. Обов’язкове поле. */
@@ -41,6 +40,7 @@ public class PatientModel {
 
     /** Номер палати, де перебуває пацієнт. */
     @NotNull(message = "Палата не може бути порожньою")
+    @Min(value = 0, message = "Номер палати не може бути від’ємним")
     private Integer ward;
 
     /** Лікар, який відповідає за пацієнта. */
@@ -49,7 +49,7 @@ public class PatientModel {
     private PersonalModel doctor;
 
     /** Додаткові нотатки лікаря про пацієнта. Максимум 500 символів. */
-    @Size(max = 500, message = "Нотатки не можуть перевищувати 500 символів")
+    @Size(max = 100, message = "Нотатки не можуть перевищувати 100 символів")
     private String notes;
 
     /** Дата початку лікування (прийому) пацієнта. */
@@ -66,6 +66,7 @@ public class PatientModel {
 
     /** Номер ліжка пацієнта. */
     @NotNull(message = "Поле 'Ліжко' не може бути порожньою")
+    @Min(value = 0, message = "Номер ліжка не може бути від’ємним")
     private Integer bed;
 
     /**

@@ -114,9 +114,10 @@
 
         <!-- Дата народження -->
         <div class="col-md-6 mb-3">
-          <label for="birthDate" class="form-label">Дата народження <span class="text-danger">*</span></label>
+          <label for="birthDate" class="form-label">Дата народження <span th:text="*{birthDate}"></span><span class="text-danger">*</span></label>
           <input type="date"
-                 th:field="*{birthDate}"
+                 name="birthDate"
+                 th:value="*{birthDate}"
                  th:class="${#fields.hasErrors('birthDate')} ? 'form-control is-invalid' : 'form-control'"
                  id="birthDate">
           <div th:if="${#fields.hasErrors('birthDate')}" class="invalid-feedback">
@@ -199,9 +200,10 @@
       <div class="row">
         <!-- Дата прийому -->
         <div class="col-md-6 mb-3">
-          <label for="appointmentDateFrom" class="form-label">Дата прийому <span class="text-danger">*</span></label>
+          <label for="appointmentDateFrom" class="form-label">Дата прийому <span th:text="${#temporals.format(patient.appointmentDateFrom, 'yyyy-MM-dd HH:mm')}"></span><span class="text-danger">*</span></label>
           <input type="datetime-local"
-                 th:field="*{appointmentDateFrom}"
+                 name="appointmentDateFrom"
+                 th:value="*{appointmentDateFrom}"
                  th:class="${#fields.hasErrors('appointmentDateFrom')} ? 'form-control is-invalid' : 'form-control'"
                  id="appointmentDateFrom">
           <div th:if="${#fields.hasErrors('appointmentDateFrom')}" class="invalid-feedback">
@@ -211,9 +213,10 @@
 
         <!-- Дата виписки -->
         <div class="col-md-6 mb-3">
-          <label for="appointmentDateTo" class="form-label">Дата виписки <span class="text-danger">*</span></label>
+          <label for="appointmentDateTo" class="form-label">Дата виписки <span th:text="${#temporals.format(patient.appointmentDateTo, 'yyyy-MM-dd HH:mm')}"></span><span class="text-danger">*</span></label>
           <input type="datetime-local"
-                 th:field="*{appointmentDateTo}"
+                 name="appointmentDateTo"
+                 th:value="*{appointmentDateTo}"
                  th:class="${#fields.hasErrors('appointmentDateTo')} ? 'form-control is-invalid' : 'form-control'"
                  id="appointmentDateTo">
           <div th:if="${#fields.hasErrors('appointmentDateTo')}" class="invalid-feedback">

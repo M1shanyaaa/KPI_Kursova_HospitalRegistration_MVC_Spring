@@ -5,6 +5,7 @@ import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PatientRepo;
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.service.AuthorizationService;
+import hospital_registration.demo.service.PatientValidationService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,11 @@ public class AddPatientController {
 
     @Autowired
     private AuthorizationService authService;
+
+    @Autowired
+    private PatientValidationService patientValidationService;
+
+
 
     /**
      * Конструктор із залежностями репозиторіїв пацієнтів та лікарів.
@@ -73,15 +79,17 @@ public class AddPatientController {
     @PostMapping("/add")
     public String addPatient(
             @Valid @ModelAttribute("patient") PatientModel patient,
-            BindingResult bindingResult,
+            BindingResult bindingResult, Model model,
             RedirectAttributes redirectAttributes,
-            HttpSession session,
-            Model model) {
+            HttpSession session) {
 
         PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
         if (!authService.hasNurseAccess(loggedInUser)) {
             return "redirect:/access-denied";
         }
+
+        patientValidationService.validateDates(patient, bindingResult);
+        System.out.println(bindingResult.hasErrors());
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("doctors", doctorRepo.findAll());

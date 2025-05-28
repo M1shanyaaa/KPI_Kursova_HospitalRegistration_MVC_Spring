@@ -33,6 +33,17 @@
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        .btn-outline-purple {
+            color: #6f42c1; /* фіолетовий */
+            border-color: #6f42c1;
+        }
+
+        .btn-outline-purple:hover,
+        .btn-outline-purple:focus {
+            background-color: #6f42c1;
+            color: white;
+            border-color: #6f42c1;
+        }
     </style>
 </head>
 <body>
@@ -99,20 +110,24 @@
                 <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"></td>
                 <td>
-                    <div class="btn-group-vertical mb-1" role="group">
-                            <a th:href="@{/patients/edit/{id}(id=${patient.id})}"
-                               class="btn btn-sm btn-primary">
-                                Редагувати
-                            </a>
+                    <div class="d-flex flex-column gap-2">
+                        <a th:href="@{/patients/edit/{id}(id=${patient.id})}"
+                           class="btn btn-outline-primary btn-sm w-100">
+                            Редагувати
+                        </a>
+
                         <button type="button"
-                                class="btn btn-sm btn-warning mt-1"
+                                class="btn btn-outline-purple btn-sm w-100"
                                 data-bs-toggle="modal"
                                 th:data-bs-target="'#dischargeModal__' + ${patient.id}">
                             Змінити виписку
                         </button>
-                        <form th:action="@{/patients/delete}" method="post" style="display:inline;">
+
+                        <form th:action="@{/patients/delete}" method="post" class="w-100">
                             <input type="hidden" name="patientId" th:value="${patient.id}" />
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm w-100"
+                                    onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
                                 Виписати
                             </button>
                         </form>
