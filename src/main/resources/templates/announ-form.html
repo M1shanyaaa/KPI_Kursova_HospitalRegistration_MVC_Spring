@@ -51,8 +51,20 @@
         </div>
 
 
-        <button type="submit" class="btn btn-primary">Поширити</button>
+        <button type="submit" class="btn btn-primary"  id="submitBtn">Поширити</button>
     </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector("form");
+            const submitBtn = document.getElementById("submitBtn");
+
+            form.addEventListener("submit", function () {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Надсилання...";
+            });
+        });
+    </script>
 
     <!-- Додаткова інформація -->
     <div class="row mt-4 card-body">

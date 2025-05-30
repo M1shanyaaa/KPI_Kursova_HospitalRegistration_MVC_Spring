@@ -3,12 +3,16 @@ package hospital_registration.demo.controllers;
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.service.AuthorizationService;
+import hospital_registration.demo.service.PersonalValidationService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -28,6 +32,9 @@ public class EditPersonalController {
 
     @Autowired
     private AuthorizationService authService;
+
+    @Autowired
+    PersonalValidationService validationService;
 
     /**
      * Відображає таблицю всіх співробітників для головного лікаря.
@@ -76,51 +83,52 @@ public class EditPersonalController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/personal/update")
-    public String updatePersonal(@RequestParam Long id,
-                                 @RequestParam String fullName,
-                                 @RequestParam String login,
-                                 @RequestParam String position,
-                                 @RequestParam String specialty,
-                                 @RequestParam String email,
-                                 @RequestParam String phone,
+    public String updatePersonal(@Valid @ModelAttribute("person") PersonalModel person,
+                                 BindingResult bindingResult,
                                  @RequestParam(required = false) String password,
                                  HttpSession session,
-                                 RedirectAttributes redirectAttributes) {
-        PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
-        if (user == null || !authService.isMainDoctor(user)) {
+                                 RedirectAttributes redirectAttributes,
+                                 Model model) {
+
+        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
+        if (loggedInUser == null || !authService.isMainDoctor(loggedInUser)) {
             return "redirect:/";
         }
 
-        PersonalModel personal = personalRepo.findById(id).orElse(null);
-        if (personal != null) {
-            personal.setFullName(fullName);
-            personal.setLogin(login);
-            personal.setPosition(position);
-            personal.setSpecialty(specialty);
-            personal.setEmail(email);
-
-            // Fix: Convert String to Integer with error handling
-            try {
-                Integer phoneNumber = Integer.parseInt(phone);
-                personal.setPhone(phoneNumber);
-            } catch (NumberFormatException e) {
-                redirectAttributes.addFlashAttribute("error", "Некоректний формат номера телефону!");
-                return "redirect:/editPersinal";
-            }
-
-            // Update password without encoding
-            if (password != null && !password.trim().isEmpty()) {
-                personal.setAccess_key(password);
-            }
-
-            personalRepo.save(personal);
-            redirectAttributes.addFlashAttribute("message", "Інформацію оновлено успішно!");
-        } else {
+        // Перевірка наявності персоналу
+        PersonalModel existing = personalRepo.findById(person.getId()).orElse(null);
+        if (existing == null) {
             redirectAttributes.addFlashAttribute("error", "Співробітника не знайдено!");
+            return "redirect:/editPersonal";
         }
 
-        return "redirect:/editPersinal";
+        // Валідація (з урахуванням ID для унікальності login/email)
+        validationService.validatePersonal(person, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("user", loggedInUser);
+            model.addAttribute("person", person);
+            return "editPersonal";
+        }
+
+        // Копіювання полів, крім пароля, якщо порожній
+        existing.setFullName(person.getFullName());
+        existing.setLogin(person.getLogin());
+        existing.setPosition(person.getPosition());
+        existing.setSpecialty(person.getSpecialty());
+        existing.setEmail(person.getEmail());
+        existing.setPhone(person.getPhone());
+
+        if (password != null && !password.trim().isEmpty()) {
+            existing.setAccess_key(password); // додай хешування, якщо потрібно
+        }
+
+        personalRepo.save(existing);
+        redirectAttributes.addFlashAttribute("message", "Інформацію оновлено успішно!");
+
+        return "redirect:/editPersonal";
     }
+
 
 
     /**

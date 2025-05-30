@@ -34,13 +34,16 @@
         }
         .table-container {
             margin: 40px auto;
-            max-width: 1200px;
             background-color: white;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .search-bar {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
     </style>
@@ -57,7 +60,7 @@
     </div>
 
     <div class="row justify-content-center search-bar">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <form method="get" th:action="@{/historypatients}">
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -88,47 +91,42 @@
     </div>
 
     <div class="table-container">
-        <div th:if="${patients != null and !patients.isEmpty()}">
-            <table class="table table-bordered table-hover custom-table">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Ім'я</th>
-                    <th>Телефон</th>
-                    <th>Діагноз</th>
-                    <th>Дата народження</th>
-                    <th>Палата</th>
-                    <th>Лікар</th>
-                    <th>Відділення</th>
-                    <th>Прийом</th>
-                    <th>Виписка</th>
-                    <th>Примітки</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="patient, iterStat : ${patients}">
-                    <td th:text="${iterStat.count}">1</td>
-                    <td th:text="${patient.fullName}">Ім'я</td>
-                    <td th:text="${patient.phone}">Телефон</td>
-                    <td th:text="${patient.diagnosis}">Діагноз</td>
-                    <td th:text="${#temporals.format(patient.birthDate, 'dd.MM.yyyy')}">Дата народження</td>
-                    <td th:text="'Палата ' + ${patient.ward} + ', ліжко ' + ${patient.bed}">Палата</td>
-                    <td>
-                        <span th:text="${patient.doctor.fullName}"></span>
-                        <br/>
-                        <small class="text-muted" th:text="${patient.doctor.specialty}"></small>
-                    </td>
-                    <td th:text="${patient.department}">Відділення</td>
-                    <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}">Прийом</td>
-                    <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}">Виписка</td>
-                    <td>
-                        <span th:if="${patient.notes != null and !patient.notes.isEmpty()}" th:text="${patient.notes}"></span>
-                        <span th:if="${patient.notes == null or patient.notes.isEmpty()}" class="text-muted fst-italic">Немає</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+        <table class="table table-bordered table-hover custom-table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Ім'я пацієнта</th>
+                <th>Рік народження</th>
+                <th>Палата</th>
+                <th>Телефон</th>
+                <th>Діагноз</th>
+                <th>Нотатки</th>
+                <th>Відділення</th>
+                <th>Дата прийому</th>
+                <th>Дата виписки</th>
+                <th>Лікар</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="patient : ${patients}">
+                <td th:text="${patient.id}"></td>
+                <td th:text="${patient.fullName}"></td>
+                <td th:text="${#temporals.format(patient.birthDate, 'dd.MM.yyyy')}"></td>
+                <td style="min-width: 150px" th:text="'Палата ' + ${patient.ward} + ', ліжко ' + ${patient.bed}"></td>
+                <td th:text="${patient.phone}"></td>
+                <td th:text="${patient.diagnosis}"></td>
+                <td style="max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <span th:text="${patient.notes}" th:title="${patient.notes}"></span>
+                </td>
+                <td th:text="${patient.department}">Відділення</td>
+                <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${patient.doctor.fullName}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
         <div th:if="${patients == null or patients.isEmpty()}" class="text-center p-5 text-muted">
             <i class="fas fa-search fa-3x mb-3"></i>
             <h4>Записи не знайдено</h4>
@@ -142,10 +140,9 @@
                 Показати всі записи
             </a>
         </div>
-    </div>
 
     <!-- Додаткова інформація -->
-    <div class="row mt-4 card-body">
+    <div class="container mt-4 card-body">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
@@ -163,7 +160,6 @@
         </div>
     </div>
 
-</div>
 <footer th:insert="~{blocks/footer :: footer}"></footer>
 </body>
 </html>

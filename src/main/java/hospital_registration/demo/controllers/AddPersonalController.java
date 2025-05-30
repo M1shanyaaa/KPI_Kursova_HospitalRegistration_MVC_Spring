@@ -3,6 +3,7 @@ package hospital_registration.demo.controllers;
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.service.AuthorizationService;
+import hospital_registration.demo.service.PersonalValidationService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class AddPersonalController {
 
     @Autowired
     private AuthorizationService authService;
+
+    @Autowired
+    PersonalValidationService validationService;
 
     /**
      * Відображає форму для створення нового працівника лікарні.
@@ -79,18 +83,13 @@ public class AddPersonalController {
             return "redirect:/access-denied";
         }
 
+        validationService.validatePersonal(person, bindingResult);
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", loggedInUser);
             return "addPersonal";
         }
 
-        // Перевірка, чи логін уже зайнятий
-        Optional<PersonalModel> existingPerson = personalRepo.findByLogin(person.getLogin());
-        if (existingPerson.isPresent()) {
-            model.addAttribute("errorMessage", "Цей логін вже існує. Виберіть інший логін.");
-            model.addAttribute("user", loggedInUser);
-            return "addPersonal";
-        }
 
         // Збереження нового працівника
         personalRepo.save(person);

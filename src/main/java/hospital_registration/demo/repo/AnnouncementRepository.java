@@ -4,10 +4,13 @@ import hospital_registration.demo.Models.Announcement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Репозиторій для роботи з оголошеннями {@link Announcement}.
  * Надає базові CRUD-операції через інтерфейс JpaRepository.
  */
 @Repository
 public interface AnnouncementRepository extends JpaRepository<Announcement, Long> {
+    List<Announcement> findAllByOrderByCreatedAtDesc();
 }

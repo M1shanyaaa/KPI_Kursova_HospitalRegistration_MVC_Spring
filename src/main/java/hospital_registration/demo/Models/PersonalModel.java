@@ -17,6 +17,7 @@ public class PersonalModel {
 
     /** Повне ім’я співробітника. Обов’язкове поле. */
     @NotBlank(message = "Ім'я не може бути порожнім")
+    @Pattern(regexp = ".*[a-zA-Zа-яА-ЯіІїЇєЄґҐ].*", message = "Ім'я має містити хоча б одну букву")
     private String fullName;
 
     /** Унікальний логін для входу в систему. */
@@ -26,8 +27,8 @@ public class PersonalModel {
 
     /** Номер телефону. Має бути щонайменше 9-значним числом. */
     @NotNull(message = "Номер телефону не може бути порожнім")
-    @Min(value = 100000000, message = "Некоректний номер телефону")
-    private Integer phone = 0;
+    @Pattern(regexp = "0\\d{9}", message = "Телефон має бути у форматі 0xxxxxxxxx")
+    private String phone;
 
     /** Посада співробітника (наприклад, лікар, медсестра). */
     @NotBlank(message = "Позиція не може бути порожньою")
@@ -63,11 +64,11 @@ public class PersonalModel {
      * @param access_key ключ доступу
      * @param email електронна пошта
      */
-    public PersonalModel(String fullName, String login, Integer phone, String position,
+    public PersonalModel(String fullName, String login, String phone, String position,
                          String specialty, String access_key, String email) {
         this.fullName = fullName;
         this.login = login;
-        this.phone = (phone != null) ? phone : 0;
+        this.phone = phone;
         this.position = position;
         this.specialty = specialty;
         this.access_key = access_key;
@@ -105,13 +106,13 @@ public class PersonalModel {
     }
 
     /** @return номер телефону */
-    public Integer getPhone() {
+    public String getPhone() {
         return phone;
     }
 
     /** @param phone номер телефону */
-    public void setPhone(Integer phone) {
-        this.phone = (phone != null) ? phone : 0;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     /** @return посада */

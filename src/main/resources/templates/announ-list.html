@@ -11,16 +11,17 @@
             margin: 0;
             padding: 0;
         }
+
         body {
             background-color: #f4f8fb;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
+
         footer {
             margin-top: auto;
         }
-
 
         h1 {
             color: #0d6efd;
@@ -33,24 +34,43 @@
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
 
         .announcement-title {
             color: #0d6efd;
             font-size: 1.5rem;
             font-weight: bold;
+
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
 
         .announcement-date {
             font-size: 0.9rem;
             color: #6c757d;
+
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
 
         .container-narrow {
-            max-width: 900px;
+            max-width: 1140px;
             margin: 0 auto;
         }
+
+        .long-text {
+            overflow-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
     </style>
+
 </head>
 <body>
 
@@ -66,7 +86,7 @@
         <div class="announcement-date" th:text="${#temporals.format(a.createdAt, 'dd.MM.yyyy HH:mm')}">
             Дата публікації
         </div>
-        <div class="mt-3" th:text="${a.content}">Текст оголошення</div>
+        <div class="mt-3 long-text" th:text="${a.content}">Текст оголошення</div>
     </div>
 
     <!-- Додаткова інформація -->

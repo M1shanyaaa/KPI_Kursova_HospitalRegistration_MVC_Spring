@@ -114,7 +114,7 @@ public class AddAnnouncementController {
             return "redirect:/";
         }
 
-        List<Announcement> announcements = announcementRepository.findAll();
+        List<Announcement> announcements = announcementRepository.findAllByOrderByCreatedAtDesc();
         model.addAttribute("user", user);
         model.addAttribute("announcements", announcements);
         return "announ-list";

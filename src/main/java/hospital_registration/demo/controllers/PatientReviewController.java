@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -132,10 +129,11 @@ public class PatientReviewController {
      * @return редірект на інформаційну панель лікаря
      */
 
-    // Обробка збереження нової дати виписки
+    // Оновлення дати
     @PostMapping("/patients/discharge/update")
     public String updateDischargeDate(@RequestParam Long patientId,
                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dischargeDate,
+                                      @RequestParam String referer,
                                       HttpSession session,
                                       RedirectAttributes redirectAttributes) {
 
@@ -156,10 +154,28 @@ public class PatientReviewController {
             return "redirect:/access-denied";
         }
 
+        // Валідація: dischargeDate не може бути раніше за дату запису
+        if (dischargeDate.isBefore(patient.getAppointmentDateFrom())) {
+            redirectAttributes.addFlashAttribute("error", "Дата виписки не може бути раніше дати запису (" +
+                    patient.getAppointmentDateFrom().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + ").");
+
+            // Повернення на referer з урахуванням AllReview
+            if (referer != null && referer.contains("/AllReview")) {
+                return "redirect:/AllReview";
+            } else {
+                return "redirect:/DoctorHome/dashboard/" + patient.getDoctor().getId();
+            }
+        }
+
         patient.setAppointmentDateTo(dischargeDate);
         patientRepo.save(patient);
         redirectAttributes.addFlashAttribute("message", "Дата виписки оновлена для пацієнта " + patient.getFullName());
-        return "redirect:/DoctorHome/dashboard/" + patient.getDoctor().getId();
+
+        if (referer != null && referer.contains("/AllReview")) {
+            return "redirect:/AllReview";
+        } else {
+            return "redirect:/DoctorHome/dashboard/" + patient.getDoctor().getId();
+        }
     }
 
     /**
@@ -174,6 +190,7 @@ public class PatientReviewController {
 
     @PostMapping("/patients/delete")
     public String deletePatient(@RequestParam Long patientId,
+                                @RequestParam String referer,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
 
@@ -211,7 +228,11 @@ public class PatientReviewController {
         historyPatientRepo.save(pastPatient);
         patientRepo.delete(patient);
         redirectAttributes.addFlashAttribute("message", "Пацієнта " + patient.getFullName() + " було виписано (видалено).");
-        return "redirect:/DoctorHome/dashboard/" + doctorId;
+        if (referer != null && referer.contains("/AllReview")) {
+            return "redirect:/AllReview";
+        } else {
+            return "redirect:/DoctorHome/dashboard/" + patient.getDoctor().getId();
+        }
     }
 
     /**

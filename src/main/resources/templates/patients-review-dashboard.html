@@ -38,7 +38,6 @@
 
         .table-container {
             margin: 40px auto;
-            max-width: 900px;
             background-color: white;
             padding: 20px;
             border-radius: 15px;
@@ -55,6 +54,13 @@
             color: white;
             border-color: #6f42c1;
         }
+        .search-bar {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -67,29 +73,32 @@
         <p class="text-muted">Перегляд інформації моїх пацієнтів </p>
     </div>
 
-    <div class="row justify-content-center search-bar">
-        <div class="col-md-10">
-            <form method="get" th:action="@{/DoctorHome/dashboard/{id}(id=${doctorId})}">
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" name="search" id="search"
-                               th:value="${searchTerm}" placeholder="Введіть ім'я, телефон або діагноз...">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="search-bar">
+                <form method="get" th:action="@{/DoctorHome/dashboard/{id}(id=${doctorId})}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="search" id="search"
+                                   th:value="${searchTerm}" placeholder="Введіть ім'я, логін, посаду або email...">
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" name="searchType" id="searchType" th:value="${searchType}">
+                                <option value="all" th:selected="${searchType == 'all'}">По всіх полях</option>
+                                <option value="name" th:selected="${searchType == 'name'}">Ім'я</option>
+                                <option value="phone" th:selected="${searchType == 'phone'}">Телефон</option>
+                                <option value="diagnosis" th:selected="${searchType == 'diagnosis'}">Діагноз</option>
+                                <option value="recordedDATE" th:selected="${searchType == 'recordedDATE'}">Дата запису</option>
+                                <option value="dischargeDATE" th:selected="${searchType == 'dischargeDATE'}">Дата виписки</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex">
+                            <button type="submit" class="btn btn-primary w-100 me-1">Знайти</button>
+                            <a th:href="@{/DoctorHome/dashboard/{id}(id=${doctorId})}" class="btn btn-secondary">Очистити</a>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="searchType" id="searchType" th:value="${searchType}">
-                            <option value="all" th:selected="${searchType == 'all'}">По всіх полях</option>
-                            <option value="name" th:selected="${searchType == 'name'}">Ім'я</option>
-                            <option value="phone" th:selected="${searchType == 'phone'}">Телефон</option>
-                            <option value="diagnosis" th:selected="${searchType == 'diagnosis'}">Діагноз</option>
-                            <option value="dischargeDATE" th:selected="${searchType == 'dischargeDATE'}">Дата виписки</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex">
-                        <button type="submit" class="btn btn-primary w-100 me-1">Знайти</button>
-                        <a href="/historypatients" class="btn btn-secondary">Очистити</a>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -103,11 +112,15 @@
             <tr>
                 <th>#</th>
                 <th>Ім'я пацієнта</th>
+                <th>Рік народження</th>
+                <th>Палата</th>
                 <th>Телефон</th>
                 <th>Діагноз</th>
                 <th>Нотатки</th>
+                <th>Відділення</th>
                 <th>Дата прийому</th>
                 <th>Дата виписки</th>
+                <th>Лікар</th>
                 <th>Дії</th>
             </tr>
             </thead>
@@ -115,11 +128,17 @@
             <tr th:each="patient : ${patients}">
                 <td th:text="${patient.id}"></td>
                 <td th:text="${patient.fullName}"></td>
+                <td th:text="${#temporals.format(patient.birthDate, 'dd.MM.yyyy')}"></td>
+                <td style="min-width: 150px" th:text="'Палата ' + ${patient.ward} + ', ліжко ' + ${patient.bed}"></td>
                 <td th:text="${patient.phone}"></td>
                 <td th:text="${patient.diagnosis}"></td>
-                <td th:text="${patient.notes}"></td>
+                <td style="max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    <span th:text="${patient.notes}" th:title="${patient.notes}"></span>
+                </td>
+                <td th:text="${patient.department}">Відділення</td>
                 <td th:text="${#temporals.format(patient.appointmentDateFrom, 'dd.MM.yyyy HH:mm')}"></td>
                 <td th:text="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"></td>
+                <td th:text="${patient.doctor.fullName}"></td>
                 <td>
                     <div class="d-flex flex-column gap-2">
                         <a th:href="@{/patients/edit/{id}(id=${patient.id})}"
@@ -141,6 +160,7 @@
                                     onclick="return confirm('Ви впевнені, що хочете виписати пацієнта?')">
                                 Виписати
                             </button>
+                            <input type="hidden" name="referer" value="/DoctorHome/dashboard/"/>
                         </form>
                     </div>
                 </td>
@@ -169,6 +189,8 @@
                                th:value="${#temporals.format(patient.appointmentDateTo, 'dd.MM.yyyy HH:mm')}"
                                required />
                     </div>
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                    <input type="hidden" name="referer" value="/DoctorHome/dashboard/" />
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
                         <button type="submit" class="btn btn-primary">Оновити</button>

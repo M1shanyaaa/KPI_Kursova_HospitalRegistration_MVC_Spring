@@ -1,9 +1,6 @@
 package hospital_registration.demo.Models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 
@@ -30,6 +27,7 @@ public class Announcement {
      * Вміст оголошення. Не може бути порожнім.
      */
     @NotNull(message = "Вміст оголошення не може бути порожньою")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     /**

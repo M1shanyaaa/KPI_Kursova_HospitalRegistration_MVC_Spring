@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login Page</title>
-  <link rel="stylesheet" href="/static/cssset.css" />
-  <!-- Font Awesome CDN link for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   <style>
     html, body {
       height: 100%;
@@ -54,7 +51,7 @@
     }
     .row input {
       width: 100%;
-      padding: 10px 15px 10px 40px;
+      padding: 10px 15px 10px 20px;
       font-size: 16px;
       border: 1px solid #ddd;
       border-radius: 5px;
@@ -80,11 +77,6 @@
     .button input:hover {
       background: #4a52d4;
     }
-    .signup-link {
-      text-align: center;
-      font-size: 14px;
-      color: #666;
-    }
     .signup-link a {
       color: #6b73ff;
       text-decoration: none;
@@ -94,11 +86,33 @@
     .signup-link a:hover {
       color: #4a52d4;
     }
+    .text-danger {
+      color: #d9534f; /* Яскраво-червоний */
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-top: 5px;
+      padding-left: 5px;
+      position: relative;
+    }
+
+    .text-danger::before {
+      content: "⚠ ";
+      font-weight: bold;
+      margin-right: 4px;
+    }
+
   </style>
 </head>
 <body>
 <div class="wrapper">
   <div class="title"><span>Log in</span></div>
+
+  <div th:if="${errorMessage}" class="text-center text-danger d-flex align-items-center justify-content-center gap-2" style="margin-bottom: 15px;">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span th:text="${errorMessage}">Невірний логін або пароль</span>
+  </div>
+
+
   <form action="/" method="post">
     <div class="row">
       <i class="fas fa-user"></i>

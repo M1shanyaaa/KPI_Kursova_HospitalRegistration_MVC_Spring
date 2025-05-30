@@ -30,7 +30,7 @@ public class AdminInit {
                 PersonalModel admin = new PersonalModel(
                         "Рибак Михайло Класович",
                         adminLogin,
-                        960741514,
+                        "0960741514",
                         "Головний лікар",
                         "Хірург",
                         hashedPassword,

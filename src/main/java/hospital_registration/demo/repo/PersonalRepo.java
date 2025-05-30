@@ -101,7 +101,7 @@ public interface PersonalRepo extends JpaRepository<PersonalModel, Long> {
      * @param phone номер телефону
      * @return список співробітників з указаним телефоном
      */
-    List<PersonalModel> findByPhone(Integer phone);
+    List<PersonalModel> findByPhone(String phone);
 
     /**
      * Універсальний пошук по всіх текстових полях.
