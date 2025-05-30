@@ -81,7 +81,6 @@ public class EditPatientController {
         if (authService.isDoctor(loggedInUser) && !loggedInUser.getId().equals(patient.getDoctor().getId())) {
             return "redirect:/access-denied";
         }
-        System.out.println(patient.getBirthDate());
 
         model.addAttribute("patient", patient);
         model.addAttribute("user", loggedInUser);
@@ -135,7 +134,6 @@ public class EditPatientController {
         }
 
         patientValidationService.validateDates(patient, bindingResult);
-        System.out.println(bindingResult.hasErrors());
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("user", loggedInUser);

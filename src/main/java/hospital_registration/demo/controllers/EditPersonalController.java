@@ -3,8 +3,8 @@ package hospital_registration.demo.controllers;
 import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.service.AuthorizationService;
-import hospital_registration.demo.service.PersonalValidationService;
 import jakarta.servlet.http.HttpSession;
+import hospital_registration.demo.service.PersonalValidationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +35,10 @@ public class EditPersonalController {
     private AuthorizationService authService;
 
     @Autowired
-    PersonalValidationService validationService;
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    PersonalValidationService personalValidationService;
 
     /**
      * Відображає таблицю всіх співробітників для головного лікаря.
@@ -79,57 +83,81 @@ public class EditPersonalController {
         return "edit-personal";
     }
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @PostMapping("/personal/update")
     public String updatePersonal(@Valid @ModelAttribute("person") PersonalModel person,
                                  BindingResult bindingResult,
-                                 @RequestParam(required = false) String password,
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes,
                                  Model model) {
-
-        PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
-        if (loggedInUser == null || !authService.isMainDoctor(loggedInUser)) {
+        PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
+        if (user == null || !authService.isMainDoctor(user)) {
             return "redirect:/";
         }
 
-        // Перевірка наявності персоналу
-        PersonalModel existing = personalRepo.findById(person.getId()).orElse(null);
-        if (existing == null) {
-            redirectAttributes.addFlashAttribute("error", "Співробітника не знайдено!");
-            return "redirect:/editPersonal";
-        }
-
-        // Валідація (з урахуванням ID для унікальності login/email)
-        validationService.validatePersonal(person, bindingResult);
+        personalValidationService.validatePersonal(person, bindingResult);
 
         if (bindingResult.hasErrors()) {
+            PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
             model.addAttribute("user", loggedInUser);
-            model.addAttribute("person", person);
-            return "editPersonal";
+            model.addAttribute("personalList", personalRepo.findAll());
+            model.addAttribute("person", person); // Передаємо помилковий об'єкт назад у форму
+            model.addAttribute("error", "Виникла помилка при оновленні даних. Введені дані вже наявні у іншого користувача.");
+            return "edit-personal";
         }
 
-        // Копіювання полів, крім пароля, якщо порожній
-        existing.setFullName(person.getFullName());
-        existing.setLogin(person.getLogin());
-        existing.setPosition(person.getPosition());
-        existing.setSpecialty(person.getSpecialty());
-        existing.setEmail(person.getEmail());
-        existing.setPhone(person.getPhone());
 
-        if (password != null && !password.trim().isEmpty()) {
-            existing.setAccess_key(password); // додай хешування, якщо потрібно
+        PersonalModel personal = personalRepo.findById(person.getId()).orElse(null);
+        if (person != null) {
+            // Валідація даних
+            if (person.getFullName() == null || person.getFullName().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Ім'я не може бути порожнім!");
+                return "redirect:/editPersinal";
+            }
+
+            if (person.getLogin() == null || person.getLogin().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Логін не може бути порожнім!");
+                return "redirect:/editPersinal";
+            }
+
+            if (person.getEmail() == null || person.getEmail().trim().isEmpty() || !person.getEmail().contains("@")) {
+                redirectAttributes.addFlashAttribute("error", "Некоректний формат email!");
+                return "redirect:/editPersinal";
+            }
+
+            // Валідація телефону - має бути у форматі 0xxxxxxxxx
+            if (person.getPhone() == null || person.getPhone().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Номер телефону не може бути порожнім!");
+                return "redirect:/editPersinal";
+            }
+
+            String cleanPhone = person.getPhone().trim().replaceAll("[^0-9]", ""); // Видаляємо всі нецифрові символи
+
+            if (!cleanPhone.matches("0\\d{9}")) {
+                redirectAttributes.addFlashAttribute("error", "Телефон має бути у форматі 0xxxxxxxxx (10 цифр, починається з 0)!");
+                return "redirect:/editPersinal";
+            }
+
+            // Оновлюємо дані
+            personal.setFullName(person.getFullName().trim());
+            personal.setLogin(person.getLogin().trim());
+            personal.setPosition(person.getPosition().trim());
+            personal.setSpecialty(person.getSpecialty().trim());
+            personal.setEmail(person.getEmail().trim());
+            personal.setPhone(cleanPhone); // Зберігаємо як String
+
+            // Оновлюємо пароль тільки якщо він був введений
+            if (person.getAccess_key() != null && !person.getAccess_key().trim().isEmpty()) {
+                personal.setAccess_key(person.getAccess_key().trim());
+            }
+
+            personalRepo.save(personal);
+            redirectAttributes.addFlashAttribute("message", "Інформацію про " + personal.getFullName() + " оновлено успішно!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Співробітника не знайдено!");
         }
 
-        personalRepo.save(existing);
-        redirectAttributes.addFlashAttribute("message", "Інформацію оновлено успішно!");
-
-        return "redirect:/editPersonal";
+        return "redirect:/editPersinal";
     }
-
-
 
     /**
      * Видаляє співробітника з системи.
@@ -140,7 +168,6 @@ public class EditPersonalController {
      * @param redirectAttributes об'єкт для передачі повідомлень при редіректі
      * @return редірект на сторінку керування персоналом
      */
-
     @PostMapping("/personal/delete")
     public String deletePersonal(@RequestParam Long personalId,
                                  HttpSession session,
@@ -184,7 +211,7 @@ public class EditPersonalController {
      *
      * @param allPersonal повний список персоналу
      * @param searchTerm термін для пошуку
-     * @param searchType тип пошуку (name, login, position, specialty, email, all)
+     * @param searchType тип пошуку (name, login, position, specialty, email, phone, all)
      * @return відфільтрований список персоналу
      */
     private List<PersonalModel> getFilteredPersonal(List<PersonalModel> allPersonal, String searchTerm, String searchType) {
@@ -198,25 +225,31 @@ public class EditPersonalController {
                 .filter(personal -> {
                     switch (searchType) {
                         case "name":
-                            return personal.getFullName().toLowerCase().contains(cleanSearchTerm);
+                            return personal.getFullName() != null &&
+                                    personal.getFullName().toLowerCase().contains(cleanSearchTerm);
                         case "login":
-                            return personal.getLogin().toLowerCase().contains(cleanSearchTerm);
+                            return personal.getLogin() != null &&
+                                    personal.getLogin().toLowerCase().contains(cleanSearchTerm);
                         case "position":
-                            return personal.getPosition().toLowerCase().contains(cleanSearchTerm);
+                            return personal.getPosition() != null &&
+                                    personal.getPosition().toLowerCase().contains(cleanSearchTerm);
                         case "specialty":
-                            return personal.getSpecialty().toLowerCase().contains(cleanSearchTerm);
+                            return personal.getSpecialty() != null &&
+                                    personal.getSpecialty().toLowerCase().contains(cleanSearchTerm);
                         case "email":
-                            return personal.getEmail().toLowerCase().contains(cleanSearchTerm);
+                            return personal.getEmail() != null &&
+                                    personal.getEmail().toLowerCase().contains(cleanSearchTerm);
                         case "phone":
-                            return personal.getPhone().toString().contains(cleanSearchTerm);
+                            return personal.getPhone() != null &&
+                                    personal.getPhone().contains(cleanSearchTerm);
                         case "all":
                         default:
-                            return personal.getFullName().toLowerCase().contains(cleanSearchTerm) ||
-                                    personal.getLogin().toLowerCase().contains(cleanSearchTerm) ||
-                                    personal.getPosition().toLowerCase().contains(cleanSearchTerm) ||
-                                    personal.getSpecialty().toLowerCase().contains(cleanSearchTerm) ||
-                                    personal.getEmail().toLowerCase().contains(cleanSearchTerm) ||
-                                    personal.getPhone().toString().contains(cleanSearchTerm);
+                            return (personal.getFullName() != null && personal.getFullName().toLowerCase().contains(cleanSearchTerm)) ||
+                                    (personal.getLogin() != null && personal.getLogin().toLowerCase().contains(cleanSearchTerm)) ||
+                                    (personal.getPosition() != null && personal.getPosition().toLowerCase().contains(cleanSearchTerm)) ||
+                                    (personal.getSpecialty() != null && personal.getSpecialty().toLowerCase().contains(cleanSearchTerm)) ||
+                                    (personal.getEmail() != null && personal.getEmail().toLowerCase().contains(cleanSearchTerm)) ||
+                                    (personal.getPhone() != null && personal.getPhone().contains(cleanSearchTerm));
                     }
                 })
                 .collect(Collectors.toList());
