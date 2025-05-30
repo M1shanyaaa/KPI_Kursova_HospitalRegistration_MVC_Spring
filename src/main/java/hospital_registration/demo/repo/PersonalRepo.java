@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
  * Репозиторій для персоналу лікарні {@link PersonalModel}.
  * Додатково містить методи пошуку за логіном та перевірки посади.
  */
+
 @Repository
 public interface PersonalRepo extends JpaRepository<PersonalModel, Long> {
 
@@ -101,7 +102,7 @@ public interface PersonalRepo extends JpaRepository<PersonalModel, Long> {
      * @param phone номер телефону
      * @return список співробітників з указаним телефоном
      */
-    List<PersonalModel> findByPhone(String phone);
+    Optional<PersonalModel> findByPhone(String phone);
 
     /**
      * Універсальний пошук по всіх текстових полях.

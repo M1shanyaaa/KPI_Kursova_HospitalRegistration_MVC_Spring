@@ -4,7 +4,6 @@ import hospital_registration.demo.Models.PersonalModel;
 import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.service.AuthorizationService;
 import jakarta.servlet.http.HttpSession;
-import hospital_registration.demo.service.PersonalValidationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,8 +36,6 @@ public class EditPersonalController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    PersonalValidationService personalValidationService;
 
     /**
      * Відображає таблицю всіх співробітників для головного лікаря.
@@ -82,32 +79,30 @@ public class EditPersonalController {
 
         return "edit-personal";
     }
-
     @PostMapping("/personal/update")
     public String updatePersonal(@Valid @ModelAttribute("person") PersonalModel person,
                                  BindingResult bindingResult,
                                  HttpSession session,
                                  RedirectAttributes redirectAttributes,
+                                 @RequestParam(value = "search", required = false) String searchTerm,
+                                 @RequestParam(value = "searchType", required = false, defaultValue = "all") String searchType,
                                  Model model) {
         PersonalModel user = (PersonalModel) session.getAttribute("loggedInUser");
         if (user == null || !authService.isMainDoctor(user)) {
             return "redirect:/";
         }
 
-        personalValidationService.validatePersonal(person, bindingResult);
+        // Отримуємо всіх співробітників, крім поточного користувача
+        List<PersonalModel> allPersonal = personalRepo.findAll()
+                .stream()
+                .filter(p -> !p.getId().equals(user.getId()))
+                .collect(Collectors.toList());
 
-        if (bindingResult.hasErrors()) {
-            PersonalModel loggedInUser = (PersonalModel) session.getAttribute("loggedInUser");
-            model.addAttribute("user", loggedInUser);
-            model.addAttribute("personalList", personalRepo.findAll());
-            model.addAttribute("person", person); // Передаємо помилковий об'єкт назад у форму
-            model.addAttribute("error", "Виникла помилка при оновленні даних. Введені дані вже наявні у іншого користувача.");
-            return "edit-personal";
-        }
-
+        // Фільтруємо за пошуковим запитом
+        List<PersonalModel> filteredPersonal = getFilteredPersonal(allPersonal, searchTerm, searchType);
 
         PersonalModel personal = personalRepo.findById(person.getId()).orElse(null);
-        if (person != null) {
+        if (personal != null) {
             // Валідація даних
             if (person.getFullName() == null || person.getFullName().trim().isEmpty()) {
                 redirectAttributes.addFlashAttribute("error", "Ім'я не може бути порожнім!");
@@ -134,6 +129,28 @@ public class EditPersonalController {
 
             if (!cleanPhone.matches("0\\d{9}")) {
                 redirectAttributes.addFlashAttribute("error", "Телефон має бути у форматі 0xxxxxxxxx (10 цифр, починається з 0)!");
+                return "redirect:/editPersinal";
+            }
+
+            // Валідація унікальності логіна
+            Optional<PersonalModel> existingByLogin = personalRepo.findByLogin(person.getLogin().trim());
+            if (existingByLogin.isPresent() && !existingByLogin.get().getId().equals(person.getId())) {
+                redirectAttributes.addFlashAttribute("error", "Користувач з таким логіном вже існує!");
+                return "redirect:/editPersinal";
+            }
+
+
+            // Валідація унікальності email
+            Optional<PersonalModel> existingByEmail = personalRepo.findByEmail(person.getEmail().trim());
+            if (existingByEmail.isPresent() && !existingByEmail.get().getId().equals(person.getId())) {
+                redirectAttributes.addFlashAttribute("error", "Користувач з такою електронною поштою вже існує!");
+                return "redirect:/editPersinal";
+            }
+
+            // Валідація унікальності телефону
+            Optional<PersonalModel> existingByPhone = personalRepo.findByPhone(cleanPhone);
+            if (existingByPhone.isPresent() && !existingByPhone.get().getId().equals(person.getId())) {
+                redirectAttributes.addFlashAttribute("error", "Користувач з таким номером телефону вже існує!");
                 return "redirect:/editPersinal";
             }
 
