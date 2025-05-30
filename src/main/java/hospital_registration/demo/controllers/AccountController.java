@@ -5,6 +5,7 @@ import hospital_registration.demo.repo.PersonalRepo;
 import hospital_registration.demo.service.AuthorizationService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,9 @@ public class AccountController {
 
     @Autowired
     private AuthorizationService authService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     /**
      * Відображає сторінку особистого акаунта для поточного авторизованого користувача.
@@ -92,6 +96,12 @@ public class AccountController {
             existingUser.setLogin(updatedUser.getLogin());
             existingUser.setPhone(updatedUser.getPhone());
             existingUser.setEmail(updatedUser.getEmail());
+            if (updatedUser.getAccess_key() != null && !updatedUser.getAccess_key().isEmpty()) {
+                if (authService.hasMainDoctorAccess(loggedInUser)) {
+                    String encodedPassword = passwordEncoder.encode(updatedUser.getAccess_key());
+                    existingUser.setAccess_key(encodedPassword);
+                }
+            }
             personalRepo.save(existingUser);
 
             // Якщо користувач редагує власний акаунт - оновлюємо сесію
@@ -99,6 +109,8 @@ public class AccountController {
                 session.setAttribute("loggedInUser", existingUser);
             }
         }
+
+
 
         return "redirect:/account";
     }

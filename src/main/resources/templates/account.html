@@ -121,6 +121,10 @@
           <label for="email" class="form-label">Email</label>
           <input type="email" class="form-control" id="email" name="email" th:value="${user.email}" required>
         </div>
+        <div class="mb-3" th:if="${session.loggedInUser.position.equalsIgnoreCase('Головний лікар')}">
+          <label for="access_key" class="form-label">Новий пароль</label>
+          <input type="password" class="form-control" id="access_key" name="access_key" placeholder="Введіть новий пароль">
+        </div>
       </div>
       <div class="modal-footer">
         <button type="submit" class="btn btn-success">Зберегти</button>

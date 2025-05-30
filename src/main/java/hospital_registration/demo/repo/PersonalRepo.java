@@ -145,4 +145,8 @@ public interface PersonalRepo extends JpaRepository<PersonalModel, Long> {
      * @return кількість співробітників
      */
     long countByPositionIgnoreCase(String position);
+
+    @Query("SELECT p FROM PersonalModel p WHERE LOWER(p.position) <> 'головний лікар'")
+    List<PersonalModel> findAllExceptHeadDoctor();
+
 }
